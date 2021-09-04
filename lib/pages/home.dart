@@ -12,50 +12,40 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  // add clickablelistwheelscrollview
-  //
-
-  List<String> homeBtnLabels = [
-    "Random Character Generator",
-    "Random Stage Generator",
-    "Tournament Set Assistant",
-    "Personal Set Records",
-  ];
-
-  List<Widget> homeBtnDestinations = [
-    RandomCharacterGenerator(),
-    RandomStageGenerator(),
-    TournamentAssistant(),
-    PersonalSetRecords(),
-  ];
+  Map<String, Widget> homeBtns = {
+    "Random Character Generator": RandomCharacterGenerator(),
+    "Random Stage Generator": RandomStageGenerator(),
+    "Tournament Set Assistant": TournamentAssistant(),
+    "Personal Set Records": PersonalSetRecords(),
+  };
 
   List<Widget> getHomeButtons() {
-    return List.generate(
-        homeBtnLabels.length,
-        (index) => Container(
-              color: Colors.amber,
-              child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => homeBtnDestinations[index]));
-                  },
-                  child: Text(homeBtnLabels[index])),
-            ));
+    return homeBtns.entries.map((entries) {
+      String imageUrl = entries.key.replaceAll(" ", "-");
+      print(imageUrl);
+      // surround with inkwell
+      return Container(
+          child: Image(
+        image: AssetImage("assets/$imageUrl.png"),
+      ));
+    }).toList();
   }
 
   Widget buildBody() {
-    // a container that contains listwheel scrollview of buttons
     return Container(
-      child: ListWheelScrollView(
-        itemExtent: 200,
-        diameterRatio: 1.5,
-        offAxisFraction: -0.5,
-        magnification: 2,
-        children: getHomeButtons(),
+      padding: EdgeInsets.all(16.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: getHomeButtons(),
+        ),
       ),
     );
+  }
+
+  navigateToPage(destination) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => destination));
   }
 
   @override
