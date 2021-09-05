@@ -23,11 +23,15 @@ class _HomeState extends State<Home> {
     return homeBtns.entries.map((entries) {
       String imageUrl = entries.key.replaceAll(" ", "-");
       print(imageUrl);
-      // surround with inkwell
-      return Container(
-          child: Image(
-        image: AssetImage("assets/$imageUrl.png"),
-      ));
+      return InkWell(
+        onTap: () {
+          navigateToPage(entries.value);
+        },
+        child: Container(
+            child: Image(
+          image: AssetImage("assets/$imageUrl.png"),
+        )),
+      );
     }).toList();
   }
 
