@@ -1,0 +1,106 @@
+import 'package:path/path.dart';
+import 'package:smash_app/models/rcg_character.dart';
+import 'package:smash_app/models/tournament.dart';
+import 'package:sqflite/sqflite.dart';
+
+class SmashAppDatabase {
+  intializedDB() async {
+    print('initializing database');
+    return openDatabase(
+      join(await getDatabasesPath(), 'smash_app.db'),
+      onCreate: (db, version) async {
+        await db.execute('''
+        CREATE TABLE rcg_character(
+          id integer primary key autoincrement,
+          displayName text not null,
+          filePath text not null
+        )
+        ''');
+        await db.execute('''
+        CREATE TABLE tournament(
+          id integer primary key autoincrement,
+          tournamentName text not null,
+          setLengths text not null,
+          legalStages text not null,
+          stockCount integer not null,
+          timeInMinutes integer not null,
+          additionalRules text not null
+        )
+        ''');
+      },
+      version: 2,
+    );
+  }
+
+  Future<void> insertRCGCharacterList(
+      Database db, List<RCGCharacter> rcgCharacterList) async {
+    for (RCGCharacter rcgCharacter in rcgCharacterList) {
+      await db.insert(
+        'rcg_character',
+        rcgCharacter.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    print('inserted rcg character list');
+  }
+
+  Future<List<RCGCharacter>> getRCGCharacterList(Database db) async {
+    final List<Map<String, dynamic>> maps = await db.query('rcg_character');
+    return RCGCharacter.fromMapList(maps);
+  }
+
+  Future<void> updateRCGCharacterList(
+      Database db, List<RCGCharacter> rcgCharacterList) async {
+    for (RCGCharacter rcgCharacter in rcgCharacterList) {
+      await db.update(
+        'rcg_character',
+        rcgCharacter.toMap(),
+        where: 'id = ?',
+        whereArgs: [rcgCharacter.id],
+      );
+    }
+  }
+
+  Future<void> deleteRCGCharacterList(Database db) async {
+    await db.delete('rcg_character');
+  }
+
+  Future<void> deleteRCGCharacter(Database db, int id) async {
+    await db.delete(
+      'rcg_character',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> insertTournament(Database db, Tournament tournament) async {
+    await db.insert(
+      'tournament',
+      tournament.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    print('inserted tournament');
+  }
+
+  Future<List<Tournament>> getTournamentList(Database db) async {
+    final List<Map<String, dynamic>> maps = await db.query('tournament');
+    return Tournament.fromMapList(maps);
+  }
+
+  Future<void> updateTournament(Database db, Tournament tournament) async {
+    await db.update(
+      'tournament',
+      tournament.toMap(),
+      where: 'id = ?',
+      whereArgs: [tournament.id],
+    );
+  }
+
+  Future<void> deleteTournament(Database db, int id) async {
+    await db.delete(
+      'tournament',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+}

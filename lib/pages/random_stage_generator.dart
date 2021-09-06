@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class RandomStageGenerator extends StatefulWidget {
-  const RandomStageGenerator({Key? key}) : super(key: key);
+  final db;
+  const RandomStageGenerator({Key? key, this.db}) : super(key: key);
 
   @override
   _RandomStageGeneratorState createState() => _RandomStageGeneratorState();

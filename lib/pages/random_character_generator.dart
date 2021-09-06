@@ -1,11 +1,15 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:smash_app/models/rcg_character.dart';
+import 'package:smash_app/services/db.dart';
 
 class RandomCharacterGenerator extends StatefulWidget {
-  const RandomCharacterGenerator({Key? key}) : super(key: key);
+  final db;
+  const RandomCharacterGenerator({Key? key, this.db}) : super(key: key);
 
   @override
   _RandomCharacterGeneratorState createState() =>
@@ -13,27 +17,42 @@ class RandomCharacterGenerator extends StatefulWidget {
 }
 
 class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
-  List<dynamic> options = [];
-  String selectedOption = "";
-  List<dynamic> filePaths = [];
+  List<RCGCharacter> characters = [];
+  RCGCharacter? selectedCharacter;
 
   String imageUrl = "https://www.smashbros.com/assets_v2/img/fighter/thumb_a/";
 
   @override
   void initState() {
     super.initState();
-    // check if options are saved in local storage
-
     getOptions();
   }
 
   Future<void> getOptions() async {
-    final result = await retrieveOptions();
-    print(result['filePaths']);
-    setState(() {
-      options = result['displayNames'];
-      filePaths = result['filePaths'];
-    });
+    var rcgCharacterList =
+        await SmashAppDatabase().getRCGCharacterList(widget.db);
+    if (rcgCharacterList.length == 0) {
+      print("No RCG Characters found");
+      final result = await retrieveOptions();
+      // map result to a list of RCGCharacter objects
+      List<RCGCharacter> characters = [];
+      for (var i = 0; i < result["displayNames"].length; i++) {
+        characters.add(RCGCharacter.fromMap({
+          "id": i + 1,
+          "displayName": result["displayNames"][i],
+          "filePath": result["filePaths"][i],
+        }));
+      }
+      await SmashAppDatabase().insertRCGCharacterList(widget.db, characters);
+      setState(() {
+        this.characters = characters;
+      });
+    } else {
+      print("RCG Characters found");
+      setState(() {
+        this.characters = rcgCharacterList;
+      });
+    }
   }
 
   retrieveOptions() async {
@@ -70,7 +89,7 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
   Container buildBackButton() {
     return Container(
       margin: EdgeInsets.only(top: 20),
-      child: FlatButton(
+      child: TextButton(
         onPressed: () {
           Navigator.pop(context);
         },
@@ -89,24 +108,25 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
     return Column(
       children: [
         buildImage(),
-        Text(selectedOption),
+        Text(selectedCharacter?.displayName ?? ""),
       ],
     );
   }
 
   buildImage() {
-    if (selectedOption == "") {
+    if (selectedCharacter == null) {
       return Container();
     }
 
     // cache resulting image to local storage
-
     return Container(
-      child: Image.network(
-        imageUrl + filePaths[options.indexOf(selectedOption)] + ".png",
+      child: CachedNetworkImage(
+        placeholder: (context, url) => CircularProgressIndicator(),
+        imageUrl: imageUrl + selectedCharacter!.filePath + ".png",
+        errorWidget: (context, url, error) => Icon(Icons.error),
+        fit: BoxFit.cover,
         width: MediaQuery.of(context).size.width * 0.8,
         height: MediaQuery.of(context).size.height * 0.3,
-        fit: BoxFit.cover,
       ),
     );
   }
@@ -115,7 +135,8 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
     return TextButton(
       onPressed: () {
         Random rand = new Random();
-        setState(() => selectedOption = options[rand.nextInt(options.length)]);
+        setState(() =>
+            selectedCharacter = characters[rand.nextInt(characters.length)]);
       },
       child: Text(
         "Randomize Character",

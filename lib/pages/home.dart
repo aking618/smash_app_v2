@@ -3,6 +3,8 @@ import 'package:smash_app/pages/personal_set_records.dart';
 import 'package:smash_app/pages/random_character_generator.dart';
 import 'package:smash_app/pages/random_stage_generator.dart';
 import 'package:smash_app/pages/tournament_set_assistant.dart';
+import 'package:smash_app/services/db.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -12,25 +14,35 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Map<String, Widget> homeBtns = {
-    "Random Character Generator": RandomCharacterGenerator(),
-    "Random Stage Generator": RandomStageGenerator(),
-    "Tournament Set Assistant": TournamentAssistant(),
-    "Personal Set Records": PersonalSetRecords(),
-  };
+  var db;
+  Map<String, Widget> homeBtns = {};
+
+  @override
+  void initState() {
+    super.initState();
+    initDatabase();
+  }
+
+  Future<void> initDatabase() async {
+    Database database = await SmashAppDatabase().intializedDB();
+    setState(() {
+      db = database;
+      homeBtns = {
+        "Random Character Generator": RandomCharacterGenerator(db: database),
+        "Tournament Set Assistant": TournamentAssistant(db: database),
+        "Personal Set Records": PersonalSetRecords(db: database),
+      };
+    });
+  }
 
   List<Widget> getHomeButtons() {
     return homeBtns.entries.map((entries) {
-      String imageUrl = entries.key.replaceAll(" ", "-");
-      print(imageUrl);
-      return InkWell(
-        onTap: () {
+      return ElevatedButton(
+        child: Text(entries.key),
+        onPressed: () {
           navigateToPage(entries.value);
+          ;
         },
-        child: Container(
-            child: Image(
-          image: AssetImage("assets/$imageUrl.png"),
-        )),
       );
     }).toList();
   }
