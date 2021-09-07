@@ -17,6 +17,11 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   Map<String, dynamic> tournamentData = {};
   final _formKey = GlobalKey<FormState>();
   List<Widget> starterStagesFormFields = [];
+  List<Widget> additionalRulesFormFields = [];
+  List<Widget> counterpickStagesFormFields = [];
+  List<String> starterStages = [];
+  List<String> counterpickStages = [];
+  List<String> additionalRules = [];
 
   @override
   void initState() {
@@ -51,19 +56,21 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
       ElevatedButton(
         child: Text('Create New Tournament'),
         onPressed: () {
-          // show dialog for creating new tournament
           showDialogForNewTournament();
         },
       ),
+      printSelectedTournamentBtn(),
     ];
   }
 
   Row buildTourneySelector() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text('Select a Created Tournament'),
         DropdownButton<String>(
-          value: selectedTournament?.tournamentName ?? 'Select a tournament',
+          value: selectedTournament?.tournamentName ??
+              tournaments[0].tournamentName,
           icon: Icon(Icons.arrow_downward),
           iconSize: 24,
           elevation: 16,
@@ -91,9 +98,17 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        return buildDialogContent();
+      },
+    );
+  }
+
+  StatefulBuilder buildDialogContent() {
+    return StatefulBuilder(
+      builder: (context, StateSetter setState) {
         return AlertDialog(
           title: Text('Create New Tournament'),
-          content: buildNewTournamentForm(),
+          content: buildNewTournamentForm(setState),
           actions: <Widget>[
             TextButton(
               child: Text('Cancel'),
@@ -105,8 +120,9 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
               child: Text('Create'),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
                   Navigator.of(context).pop();
-                  // createNewTournament();
+                  createNewTournament();
                 }
               },
             ),
@@ -116,102 +132,141 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
     );
   }
 
-  buildNewTournamentForm() {
-    // TODO: figure out to add dropdown fields dynamically
-    // TODO: add those dropdown values to the tournamentData map
-    // TODO: implement counterpick stages and add those to the tournamentData map
-    // TODO: save the tournamentData map to the database
-    // TODO: add the tournament to the tournaments list
-    // TODO: update the tournament selector dropdown
-
+  buildNewTournamentForm(setState) {
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Tournament Name'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a tournament name';
-                }
-                return null;
-              },
-              onSaved: (value) =>
-                  setState(() => tournamentData['tournamentName'] = value),
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Stock Count'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a stock count';
-                }
-                if (int.tryParse(value) == null) {
-                  return 'Please enter a valid number';
-                }
-                return null;
-              },
-              onSaved: (value) => setState(
-                  () => tournamentData['stockCount'] = int.parse(value!)),
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Match Time (minutes)'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a match time';
-                }
-                if (int.tryParse(value) == null) {
-                  return 'Please enter a valid number';
-                }
-                return null;
-              },
-              onSaved: (value) => setState(
-                  () => tournamentData['timeInMinutes'] = int.parse(value!)),
-            ),
-            TextFormField(
-              decoration:
-                  InputDecoration(labelText: 'Set Lengths (ex. "3, 5")'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a set length';
-                }
-                if (value!.split(',').length > 2) {
-                  return 'Please enter up to 2 set lengths';
-                }
-                if (value!
-                    .split(',')
-                    .any((length) => int.tryParse(length) == null)) {
-                  return 'Please enter valid set lengths';
-                }
-                return null;
-              },
-              onSaved: (value) => setState(
-                  () => tournamentData['setLengths'] = value!.split(',')),
-            ),
-            // add all of starterStagesFormFields to the form even if the values change
+            tournamentNameFormField(setState),
+            stockCountFormField(setState),
+            matchTimeFormField(setState),
+            setLengthFormField(setState),
             ...starterStagesFormFields,
-
-            // add button to add another stage
-            ElevatedButton(
-              child: Text('Add Starter Stage'),
-              onPressed: () {
-                setState(() {
-                  starterStagesFormFields = List.from(starterStagesFormFields)
-                    ..add(stageDropdownForm(starterStagesFormFields.length));
-                });
-              },
-            ),
+            addStarterStageBtn(setState),
+            ...counterpickStagesFormFields,
+            addCounterpickStageBtn(setState),
+            ...additionalRulesFormFields,
+            addAdditionalRuleBtn(setState),
           ],
         ),
       ),
     );
   }
 
-  DropdownButtonFormField<Object> stageDropdownForm(length) {
+  TextFormField setLengthFormField(setState) {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Set Lengths (ex. "3, 5")'),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please enter a set length';
+        }
+        if (value.split(', ').length > 2) {
+          return 'Please enter up to 2 set lengths';
+        }
+        if (value.split(', ').any((length) => int.tryParse(length) == null)) {
+          return 'Please enter valid set lengths';
+        }
+        return null;
+      },
+      onChanged: (value) =>
+          setState(() => tournamentData['setLengths'] = value.split(', ')),
+    );
+  }
+
+  TextFormField matchTimeFormField(setState) {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Match Time (minutes)'),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please enter a match time';
+        }
+        if (int.tryParse(value) == null) {
+          return 'Please enter a valid number';
+        }
+        return null;
+      },
+      onChanged: (value) =>
+          setState(() => tournamentData['timeInMinutes'] = int.parse(value)),
+    );
+  }
+
+  TextFormField stockCountFormField(setState) {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Stock Count'),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please enter a stock count';
+        }
+        if (int.tryParse(value) == null) {
+          return 'Please enter a valid number';
+        }
+        return null;
+      },
+      onChanged: (value) =>
+          setState(() => tournamentData['stockCount'] = int.parse(value)),
+    );
+  }
+
+  TextFormField tournamentNameFormField(setState) {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Tournament Name'),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please enter a tournament name';
+        }
+        return null;
+      },
+      onChanged: (value) =>
+          setState(() => tournamentData['tournamentName'] = value),
+    );
+  }
+
+  ElevatedButton addCounterpickStageBtn(setState) {
+    return ElevatedButton(
+      child: Text('Add Counterpick Stage'),
+      onPressed: () {
+        setState(() {
+          counterpickStagesFormFields = List.from(counterpickStagesFormFields)
+            ..add(counterpickStageDropdownForm(
+                counterpickStagesFormFields.length));
+        });
+      },
+    );
+  }
+
+  ElevatedButton addStarterStageBtn(setState) {
+    return ElevatedButton(
+      child: Text('Add Starter Stage'),
+      onPressed: () {
+        setState(() {
+          starterStagesFormFields = List.from(starterStagesFormFields)
+            ..add(stageDropdownForm(starterStagesFormFields.length));
+        });
+      },
+    );
+  }
+
+  ElevatedButton addAdditionalRuleBtn(setState) {
+    return ElevatedButton(
+      child: Text('Add Additional Rule'),
+      onPressed: () {
+        setState(() {
+          additionalRulesFormFields = List.from(additionalRulesFormFields)
+            ..add(additionalRuleTextField(additionalRulesFormFields.length));
+        });
+      },
+    );
+  }
+
+  DropdownButtonFormField<String> stageDropdownForm(length) {
     return DropdownButtonFormField(
-      decoration: InputDecoration(labelText: 'Stage ${length + 1}'),
-      value: tournamentData['stage1'] ?? stageNameList[0],
-      onChanged: (value) => setState(() => tournamentData['stage1'] = value),
+      decoration: InputDecoration(labelText: 'Starter Stage ${length + 1}'),
+      value: tournamentData['stage'] ?? stageNameList[0],
+      onChanged: (value) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        setState(() => starterStages.add(value!));
+      },
       items: stageNameList.map((stage) {
         return DropdownMenuItem<String>(
           value: stage,
@@ -219,6 +274,86 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
         );
       }).toList(),
     );
+  }
+
+  DropdownButtonFormField<String> counterpickStageDropdownForm(length) {
+    return DropdownButtonFormField(
+      decoration: InputDecoration(labelText: 'Counterpick Stage ${length + 1}'),
+      value: tournamentData['stage'] ?? stageNameList[0],
+      onChanged: (value) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        setState(() => counterpickStages.add(value!));
+      },
+      items: stageNameList.map((stage) {
+        return DropdownMenuItem<String>(
+          value: stage,
+          child: Text(stage),
+        );
+      }).toList(),
+    );
+  }
+
+  TextFormField additionalRuleTextField(length) {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Additional Rule ${length + 1}'),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please enter an additional rule';
+        }
+        return null;
+      },
+      onSaved: (value) => setState(() {
+        if (!additionalRules.contains(value)) {
+          additionalRules.add(value!);
+        }
+      }),
+    );
+  }
+
+  Future<void> createNewTournament() async {
+    Map<String, dynamic> legalStages = {
+      'starterStages': starterStages,
+      'counterpickStages': counterpickStages
+    };
+    setState(() {
+      tournamentData['id'] = tournaments.length + 1;
+      tournamentData['legalStages'] = legalStages;
+      tournamentData['additionalRules'] = additionalRules;
+    });
+
+    Tournament tournament = Tournament.fromMap(tournamentData);
+
+    await SmashAppDatabase().insertTournament(widget.db, tournament);
+
+    setState(() {
+      tournaments = List.from(tournaments)..add(tournament);
+    });
+
+    resetForm();
+  }
+
+  ElevatedButton printSelectedTournamentBtn() {
+    return ElevatedButton(
+      child: Text('Print Selected Tournament'),
+      onPressed: () {
+        if (selectedTournament != null)
+          print(selectedTournament.toString());
+        else
+          print('No tournament selected');
+      },
+    );
+  }
+
+  resetForm() {
+    setState(() {
+      tournamentData = {};
+      starterStages = [];
+      counterpickStages = [];
+      additionalRules = [];
+      starterStagesFormFields = [];
+      counterpickStagesFormFields = [];
+      additionalRulesFormFields = [];
+    });
   }
 
   @override
