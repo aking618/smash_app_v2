@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smash_app/constants/constants.dart';
 import 'package:smash_app/models/tournament.dart';
+import 'package:smash_app/pages/tournament_screen.dart';
 import 'package:smash_app/services/db.dart';
 
 class TournamentAssistant extends StatefulWidget {
@@ -31,10 +32,14 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
 
   Future<void> loadTournaments() async {
     final tournaments = await SmashAppDatabase().getTournamentList(widget.db);
-    if (tournaments.isEmpty) print('No tournaments found');
+    if (tournaments.isEmpty) {
+      print('No tournaments found');
+      return;
+    }
 
     setState(() {
       this.tournaments = tournaments;
+      selectedTournament = tournaments.first;
     });
   }
 
@@ -53,13 +58,13 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   buildTASOptions() {
     return [
       tournaments.isEmpty ? Container() : buildTourneySelector(),
+      tournaments.isEmpty ? Container() : buildDisplaySelectedTourney(),
       ElevatedButton(
         child: Text('Create New Tournament'),
         onPressed: () {
           showDialogForNewTournament();
         },
       ),
-      printSelectedTournamentBtn(),
     ];
   }
 
@@ -169,8 +174,8 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
         }
         return null;
       },
-      onChanged: (value) =>
-          setState(() => tournamentData['setLengths'] = value.split(', ')),
+      onSaved: (value) =>
+          setState(() => tournamentData['setLengths'] = value!.split(', ')),
     );
   }
 
@@ -186,8 +191,8 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
         }
         return null;
       },
-      onChanged: (value) =>
-          setState(() => tournamentData['timeInMinutes'] = int.parse(value)),
+      onSaved: (value) =>
+          setState(() => tournamentData['timeInMinutes'] = int.parse(value!)),
     );
   }
 
@@ -203,8 +208,8 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
         }
         return null;
       },
-      onChanged: (value) =>
-          setState(() => tournamentData['stockCount'] = int.parse(value)),
+      onSaved: (value) =>
+          setState(() => tournamentData['stockCount'] = int.parse(value!)),
     );
   }
 
@@ -217,7 +222,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
         }
         return null;
       },
-      onChanged: (value) =>
+      onSaved: (value) =>
           setState(() => tournamentData['tournamentName'] = value),
     );
   }
@@ -327,20 +332,106 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
 
     setState(() {
       tournaments = List.from(tournaments)..add(tournament);
+      selectedTournament = tournament;
     });
 
     resetForm();
   }
 
-  ElevatedButton printSelectedTournamentBtn() {
-    return ElevatedButton(
-      child: Text('Print Selected Tournament'),
-      onPressed: () {
-        if (selectedTournament != null)
-          print(selectedTournament.toString());
-        else
-          print('No tournament selected');
+  InkWell buildDisplaySelectedTourney() {
+    return InkWell(
+      onTap: () {
+        // ayren king is the best fiance I love you. aDo you lov3e me??
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TournamentScreen(
+              tournament: selectedTournament!,
+            ),
+          ),
+        );
       },
+      child: Card(
+        child: Column(
+          children: buildTourneyContent(),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> buildTourneyContent() {
+    List<Widget> content = [
+      ListTile(
+        title: Text(
+          selectedTournament!.tournamentName,
+          style: TextStyle(fontSize: 20),
+        ),
+        subtitle: buildTourneyInfoText(),
+        trailing: IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return buildTourneyDeletionDialog(context);
+              },
+            );
+          },
+        ),
+      ),
+    ];
+
+    return content;
+  }
+
+  AlertDialog buildTourneyDeletionDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text('Delete Tournament'),
+      content: Text(
+          'Are you sure you want to delete ${selectedTournament!.tournamentName}?'),
+      actions: <Widget>[
+        ElevatedButton(
+          child: Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          child: Text('Delete'),
+          // make elevated button red
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.red),
+          ),
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await deleteTournament();
+          },
+        ),
+      ],
+    );
+  }
+
+  Future<void> deleteTournament() async {
+    await SmashAppDatabase()
+        .deleteTournament(widget.db, selectedTournament!.id);
+    setState(() {
+      tournaments = List.from(tournaments)..remove(selectedTournament);
+      selectedTournament = tournaments.isNotEmpty ? tournaments[0] : null;
+    });
+  }
+
+  Text buildTourneyInfoText() {
+    return Text(
+      '''
+    Stock Count: ${selectedTournament!.stockCount}
+    Set Lengths : ${selectedTournament!.setLengths}
+    Time Limit  : ${selectedTournament!.timeInMinutes} minutes
+    Legal Stages: 
+       Starter: ${selectedTournament!.legalStages['starterStages']}
+       Counterpick : ${selectedTournament!.legalStages['counterpickStages']}
+    Additional Rules: ${selectedTournament!.additionalRules}
+    ''',
+      style: TextStyle(fontSize: 16),
     );
   }
 
