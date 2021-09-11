@@ -100,7 +100,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   }
 
   showDialogForNewTournament() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return buildDialogContent();
@@ -111,37 +111,69 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   StatefulBuilder buildDialogContent() {
     return StatefulBuilder(
       builder: (context, StateSetter setState) {
-        return AlertDialog(
-          title: Text('Create New Tournament'),
-          content: buildNewTournamentForm(setState),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Create'),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  Navigator.of(context).pop();
-                  createNewTournament();
-                }
-              },
-            ),
-          ],
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              Text(
+                'Create New Tournament',
+                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              buildNewTournamentForm(setState),
+              buildFormActions(context),
+            ],
+          ),
         );
       },
     );
   }
 
-  buildNewTournamentForm(setState) {
+  Row buildFormActions(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        TextButton(
+          child: Text(
+            'Cancel',
+            style: TextStyle(
+              color: Colors.redAccent,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: Text(
+            'Create',
+            style: TextStyle(
+              color: Colors.greenAccent,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              _formKey.currentState!.save();
+              Navigator.of(context).pop();
+              createNewTournament();
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Form buildNewTournamentForm(setState) {
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             tournamentNameFormField(setState),
             stockCountFormField(setState),
@@ -338,24 +370,32 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
     resetForm();
   }
 
-  InkWell buildDisplaySelectedTourney() {
-    return InkWell(
-      onTap: () {
-        // ayren king is the best fiance I love you. aDo you lov3e me??
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TournamentScreen(
-              tournament: selectedTournament!,
+  Column buildDisplaySelectedTourney() {
+    return Column(
+      children: [
+        Text(
+          'Tap to begin set:',
+          style: TextStyle(fontSize: 20),
+        ),
+        InkWell(
+          onTap: () {
+            // ayren king is the best fiance I love you. aDo you lov3e me??
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TournamentScreen(
+                  tournament: selectedTournament!,
+                ),
+              ),
+            );
+          },
+          child: Card(
+            child: Column(
+              children: buildTourneyContent(),
             ),
           ),
-        );
-      },
-      child: Card(
-        child: Column(
-          children: buildTourneyContent(),
         ),
-      ),
+      ],
     );
   }
 
