@@ -10,8 +10,18 @@ class PersonalSetRecords extends StatefulWidget {
 }
 
 class _PersonalSetRecordsState extends State<PersonalSetRecords> {
+  Widget buildBody() {
+    return Container(
+      child: Text('PersonalSetRecords'),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return SafeArea(
+      child: Scaffold(
+        body: buildBody(),
+      ),
+    );
   }
 }
