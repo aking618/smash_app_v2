@@ -23,7 +23,32 @@ class _TournamentScreenState extends State<TournamentScreen> {
 
   buildBody() {
     return Container(
-      child: buildCurrentStep(),
+      child: Column(
+        children: [
+          buildCurrentScore(),
+          buildCurrentStep(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildCurrentScore() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '$player1Score',
+          style: TextStyle(fontSize: 50),
+        ),
+        Text(
+          ' - ',
+          style: TextStyle(fontSize: 50),
+        ),
+        Text(
+          '$player2Score',
+          style: TextStyle(fontSize: 50),
+        ),
+      ],
     );
   }
 
@@ -141,33 +166,28 @@ class _TournamentScreenState extends State<TournamentScreen> {
           'Play Match',
           style: TextStyle(fontSize: 20),
         ),
+        Text(
+          'Stage: $chosenStage',
+          style: TextStyle(fontSize: 16),
+        ),
+        SizedBox(height: 20),
         Text('Select Winner of Match'),
         SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Column(
-              children: [
-                Text('Player 1 : Score $player1Score'),
-                ElevatedButton(
-                  child: Text('Player 1'),
-                  onPressed: () {
-                    promptUserToConfirmPlayerChoice(0);
-                  },
-                ),
-              ],
+            ElevatedButton(
+              child: Text('Player 1'),
+              onPressed: () {
+                promptUserToConfirmPlayerChoice(0);
+              },
             ),
             SizedBox(width: 20),
-            Column(
-              children: [
-                Text('Player 2 : Score $player2Score'),
-                ElevatedButton(
-                  child: Text('Player 2'),
-                  onPressed: () {
-                    promptUserToConfirmPlayerChoice(1);
-                  },
-                ),
-              ],
+            ElevatedButton(
+              child: Text('Player 2'),
+              onPressed: () {
+                promptUserToConfirmPlayerChoice(1);
+              },
             ),
           ],
         ),
@@ -240,6 +260,70 @@ class _TournamentScreenState extends State<TournamentScreen> {
     );
   }
 
+  Widget buildWinnerDeclaredPrompt() {
+    return Container(
+      child: Column(
+        children: [
+          Text(
+            player1Score > player2Score ? 'Player 1 Wins!' : 'Player 2 Wins!',
+            style: TextStyle(fontSize: 20),
+          ),
+          buildResetButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildResetButton() {
+    return ElevatedButton(
+      child: Text('Reset'),
+      onPressed: () {
+        buildResetDialog();
+      },
+    );
+  }
+
+  Future<dynamic> buildResetDialog() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Reset'),
+          content: Text('Are you sure you want to start another set?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Yes'),
+              onPressed: () {
+                resetState();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void resetState() {
+    return setState(() {
+      player1Score = 0;
+      player2Score = 0;
+      chosenSetLength = 0;
+      chosenStage = '';
+      playingMatch = false;
+      choosingStage = true;
+      striking = false;
+      strikesRemaining = 0;
+      possibleStages = [];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -249,10 +333,4 @@ class _TournamentScreenState extends State<TournamentScreen> {
       body: buildBody(),
     );
   }
-}
-
-Widget buildWinnerDeclaredPrompt() {
-  return Container(
-    child: Text('Winner Declared'),
-  );
 }

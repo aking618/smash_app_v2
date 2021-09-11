@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:smash_app/models/rcg_character.dart';
+import 'package:smash_app/models/rsg_stage.dart';
 import 'package:smash_app/models/tournament.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -17,6 +18,13 @@ class SmashAppDatabase {
         )
         ''');
         await db.execute('''
+        CREATE TABLE rsg_stage(
+          id integer primary key autoincrement,
+          stageName text not null,
+          filePath text not null
+        )
+        ''');
+        await db.execute('''
         CREATE TABLE tournament(
           id integer primary key autoincrement,
           tournamentName text not null,
@@ -28,9 +36,47 @@ class SmashAppDatabase {
         )
         ''');
       },
-      version: 2,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.execute('''
+        DROP TABLE IF EXISTS rcg_character
+        ''');
+        await db.execute('''
+        DROP TABLE IF EXISTS rsg_stage
+        ''');
+        await db.execute('''
+        DROP TABLE IF EXISTS tournament
+        ''');
+        await db.execute('''
+        CREATE TABLE rcg_character(
+          id integer primary key autoincrement,
+          displayName text not null,
+          filePath text not null
+        )
+        ''');
+        await db.execute('''
+        CREATE TABLE rsg_stage(
+          id integer primary key autoincrement,
+          stageName text not null,
+          filePath text not null
+        )
+        ''');
+        await db.execute('''
+        CREATE TABLE tournament(
+          id integer primary key autoincrement,
+          tournamentName text not null,
+          setLengths text not null,
+          legalStages text not null,
+          stockCount integer not null,
+          timeInMinutes integer not null,
+          additionalRules text not null
+        )
+        ''');
+      },
+      version: 3,
     );
   }
+
+  /// RCG Character
 
   Future<void> insertRCGCharacterList(
       Database db, List<RCGCharacter> rcgCharacterList) async {
@@ -73,6 +119,8 @@ class SmashAppDatabase {
     );
   }
 
+  /// Tournament
+
   Future<void> insertTournament(Database db, Tournament tournament) async {
     await db.insert(
       'tournament',
@@ -103,4 +151,47 @@ class SmashAppDatabase {
       whereArgs: [id],
     );
   }
+}
+
+/// RSG Stage
+
+Future<void> insertRSGStageList(
+    Database db, List<RSGStage> rsgStageList) async {
+  for (RSGStage rsgStage in rsgStageList) {
+    await db.insert(
+      'rsg_stage',
+      rsgStage.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+  print('inserted rsg stage list');
+}
+
+Future<List<RSGStage>> getRSGStageList(Database db) async {
+  final List<Map<String, dynamic>> maps = await db.query('rsg_stage');
+  return RSGStage.fromMapList(maps);
+}
+
+Future<void> updateRSGStageList(
+    Database db, List<RSGStage> rsgStageList) async {
+  for (RSGStage rsgStage in rsgStageList) {
+    await db.update(
+      'rsg_stage',
+      rsgStage.toMap(),
+      where: 'id = ?',
+      whereArgs: [rsgStage.id],
+    );
+  }
+}
+
+Future<void> deleteRSGStageList(Database db) async {
+  await db.delete('rsg_stage');
+}
+
+Future<void> deleteRSGStage(Database db, int id) async {
+  await db.delete(
+    'rsg_stage',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
 }
