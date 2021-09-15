@@ -123,12 +123,6 @@ class _TournamentScreenState extends State<TournamentScreen> {
       });
     }
 
-    List<String> testList =
-        widget.tournament.legalStages['starterStages'].cast<String>() +
-            widget.tournament.legalStages['counterpickStages'].cast<String>();
-
-    print(testList);
-
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,

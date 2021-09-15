@@ -77,8 +77,7 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
         child: Center(
       child: Column(
         children: [
-          // add back button
-          buildBackButton(),
+          buildHeader(),
           buildResult(),
           buildRandomizeButton(),
         ],
@@ -86,20 +85,24 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
     ));
   }
 
-  Container buildBackButton() {
+  Widget buildHeader() {
     return Container(
-      margin: EdgeInsets.only(top: 20),
-      child: TextButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: Text(
-          "Back",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+      padding: EdgeInsets.all(10),
+      // back button and title with title centered
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-        ),
+          Text(
+            "Random Character Generator",
+            style: TextStyle(fontSize: 20),
+          ),
+        ],
       ),
     );
   }

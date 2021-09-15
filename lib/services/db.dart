@@ -1,4 +1,5 @@
 import 'package:path/path.dart';
+import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/models/rcg_character.dart';
 import 'package:smash_app/models/rsg_stage.dart';
 import 'package:smash_app/models/tournament.dart';
@@ -35,6 +36,16 @@ class SmashAppDatabase {
           additionalRules text not null
         )
         ''');
+        await db.execute('''
+        CREATE TABLE player_record(
+          id integer primary key autoincrement,
+          playerTag text not null,
+          characters text not null,
+          notes text not null,
+          wins integer not null,
+          losses integer not null
+        )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         await db.execute('''
@@ -45,6 +56,9 @@ class SmashAppDatabase {
         ''');
         await db.execute('''
         DROP TABLE IF EXISTS tournament
+        ''');
+        await db.execute('''
+        DROP TABLE IF EXISTS player_record
         ''');
         await db.execute('''
         CREATE TABLE rcg_character(
@@ -71,8 +85,18 @@ class SmashAppDatabase {
           additionalRules text not null
         )
         ''');
+        await db.execute('''
+        CREATE TABLE player_record(
+          id integer primary key autoincrement,
+          playerTag text not null,
+          characters text not null,
+          notes text not null,
+          wins integer not null,
+          losses integer not null
+        )
+        ''');
       },
-      version: 3,
+      version: 4,
     );
   }
 
@@ -151,47 +175,82 @@ class SmashAppDatabase {
       whereArgs: [id],
     );
   }
-}
 
-/// RSG Stage
+  /// RSG Stage
 
-Future<void> insertRSGStageList(
-    Database db, List<RSGStage> rsgStageList) async {
-  for (RSGStage rsgStage in rsgStageList) {
-    await db.insert(
+  Future<void> insertRSGStageList(
+      Database db, List<RSGStage> rsgStageList) async {
+    for (RSGStage rsgStage in rsgStageList) {
+      await db.insert(
+        'rsg_stage',
+        rsgStage.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    print('inserted rsg stage list');
+  }
+
+  Future<List<RSGStage>> getRSGStageList(Database db) async {
+    final List<Map<String, dynamic>> maps = await db.query('rsg_stage');
+    return RSGStage.fromMapList(maps);
+  }
+
+  Future<void> updateRSGStageList(
+      Database db, List<RSGStage> rsgStageList) async {
+    for (RSGStage rsgStage in rsgStageList) {
+      await db.update(
+        'rsg_stage',
+        rsgStage.toMap(),
+        where: 'id = ?',
+        whereArgs: [rsgStage.id],
+      );
+    }
+  }
+
+  Future<void> deleteRSGStageList(Database db) async {
+    await db.delete('rsg_stage');
+  }
+
+  Future<void> deleteRSGStage(Database db, int id) async {
+    await db.delete(
       'rsg_stage',
-      rsgStage.toMap(),
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Player Record
+
+  Future<void> insertPlayerRecord(
+      Database db, PlayerRecord playerRecord) async {
+    await db.insert(
+      'player_record',
+      playerRecord.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    print('inserted player record');
   }
-  print('inserted rsg stage list');
-}
 
-Future<List<RSGStage>> getRSGStageList(Database db) async {
-  final List<Map<String, dynamic>> maps = await db.query('rsg_stage');
-  return RSGStage.fromMapList(maps);
-}
+  Future<List<PlayerRecord>> getPlayerRecordList(Database db) async {
+    final List<Map<String, dynamic>> maps = await db.query('player_record');
+    return PlayerRecord.fromMapList(maps);
+  }
 
-Future<void> updateRSGStageList(
-    Database db, List<RSGStage> rsgStageList) async {
-  for (RSGStage rsgStage in rsgStageList) {
+  Future<void> updatePlayerRecord(
+      Database db, PlayerRecord playerRecord) async {
     await db.update(
-      'rsg_stage',
-      rsgStage.toMap(),
+      'player_record',
+      playerRecord.toMap(),
       where: 'id = ?',
-      whereArgs: [rsgStage.id],
+      whereArgs: [playerRecord.id],
     );
   }
-}
 
-Future<void> deleteRSGStageList(Database db) async {
-  await db.delete('rsg_stage');
-}
-
-Future<void> deleteRSGStage(Database db, int id) async {
-  await db.delete(
-    'rsg_stage',
-    where: 'id = ?',
-    whereArgs: [id],
-  );
+  Future<void> deletePlayerRecord(Database db, int id) async {
+    await db.delete(
+      'player_record',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

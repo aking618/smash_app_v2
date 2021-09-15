@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/constants.dart';
+import 'package:smash_app/models/player_record.dart';
+import 'package:smash_app/services/db.dart';
 
 class PersonalSetRecords extends StatefulWidget {
   final db;
@@ -10,9 +13,104 @@ class PersonalSetRecords extends StatefulWidget {
 }
 
 class _PersonalSetRecordsState extends State<PersonalSetRecords> {
+  final _formKey = GlobalKey<FormState>();
+  String? _searchText;
+  List<PlayerRecord> _records = [];
+  List<PlayerRecord> _filteredRecords = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchText = '';
+    getRecords();
+  }
+
+  Future<void> getRecords() async {
+    var records = await SmashAppDatabase().getPlayerRecordList(widget.db);
+    records.isEmpty
+        ? print('No records found')
+        : setState(() {
+            _records = records;
+            _filteredRecords = records;
+          });
+  }
+
   Widget buildBody() {
     return Container(
-      child: Text('PersonalSetRecords'),
+      child: Column(
+        children: [
+          buildHeader(),
+          buildSearchBar(),
+          buildList(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildHeader() {
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          //back button
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          Text(
+            'Personal Set Records',
+            style: TextStyle(fontSize: 20),
+          ),
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              // addRecord();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSearchBar() {
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: TextFormField(
+        decoration: InputDecoration(
+          hintText: 'Search by Player Tag',
+          prefixIcon: Icon(Icons.search),
+        ),
+        onChanged: (text) {
+          setState(() {
+            _searchText = text;
+            _filteredRecords = _records.where((record) {
+              // ignore case
+              var tag = record.playerTag.toLowerCase();
+              var searchText = _searchText!.toLowerCase();
+              return tag.contains(searchText);
+            }).toList();
+          });
+        },
+      ),
+    );
+  }
+
+  Widget buildList() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _filteredRecords.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(_filteredRecords[index].playerTag),
+            onTap: () {
+              // editRecord(_filteredRecords[index]);
+            },
+          );
+        },
+      ),
     );
   }
 

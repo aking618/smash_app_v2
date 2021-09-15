@@ -72,7 +72,13 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text('Select a Created Tournament'),
+        Text(
+          'Select a Created Tournament',
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         DropdownButton<String>(
           value: selectedTournament?.tournamentName ??
               tournaments[0].tournamentName,
@@ -91,7 +97,9 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
           items: tournaments.map<DropdownMenuItem<String>>((tournament) {
             return DropdownMenuItem<String>(
               value: tournament.tournamentName,
-              child: Text(tournament.tournamentName),
+              child: Text(
+                tournament.tournamentName,
+              ),
             );
           }).toList(),
         ),
@@ -151,7 +159,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
           child: Text(
             'Create',
             style: TextStyle(
-              color: Colors.greenAccent,
+              color: Colors.green,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -263,6 +271,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
     return ElevatedButton(
       child: Text('Add Counterpick Stage'),
       onPressed: () {
+        FocusScope.of(context).requestFocus(FocusNode());
         setState(() {
           counterpickStagesFormFields = List.from(counterpickStagesFormFields)
             ..add(counterpickStageDropdownForm(
@@ -276,6 +285,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
     return ElevatedButton(
       child: Text('Add Starter Stage'),
       onPressed: () {
+        FocusScope.of(context).requestFocus(FocusNode());
         setState(() {
           starterStagesFormFields = List.from(starterStagesFormFields)
             ..add(stageDropdownForm(starterStagesFormFields.length));
@@ -288,6 +298,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
     return ElevatedButton(
       child: Text('Add Additional Rule'),
       onPressed: () {
+        FocusScope.of(context).requestFocus(FocusNode());
         setState(() {
           additionalRulesFormFields = List.from(additionalRulesFormFields)
             ..add(additionalRuleTextField(additionalRulesFormFields.length));
@@ -471,7 +482,12 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
        Counterpick : ${selectedTournament!.legalStages['counterpickStages']}
     Additional Rules: ${selectedTournament!.additionalRules}
     ''',
-      style: TextStyle(fontSize: 16),
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        height: 1.5,
+        color: Colors.grey[700],
+      ),
     );
   }
 
