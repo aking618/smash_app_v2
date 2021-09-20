@@ -27,6 +27,7 @@ dependencies:
   http: ^0.13.3
   sqflite: ^2.0.0+4
   cached_network_image: ^3.1.0
+  google_fonts: ^2.1.0
   # fluttertoast:
 
   # The following adds the Cupertino Icons font to your application.
