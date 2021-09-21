@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/constants.dart';
 import 'package:smash_app/models/player_record.dart';
+import 'package:smash_app/pages/add_person_record.dart';
 import 'package:smash_app/services/db.dart';
 
 class PersonalSetRecords extends StatefulWidget {
@@ -65,9 +67,9 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
             style: TextStyle(fontSize: 20),
           ),
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.help_outline),
             onPressed: () {
-              // addRecord();
+              // show help dialog
             },
           ),
         ],
@@ -100,25 +102,71 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
 
   Widget buildList() {
     return Expanded(
-      child: ListView.builder(
-        itemCount: _filteredRecords.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_filteredRecords[index].playerTag),
-            onTap: () {
-              // editRecord(_filteredRecords[index]);
-            },
-          );
-        },
+      child: _filteredRecords.isEmpty
+          ? Text("No Records")
+          : ListView.builder(
+              itemCount: _filteredRecords.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_filteredRecords[index].playerTag),
+                  onTap: () {
+                    // editRecord(_filteredRecords[index]);
+                  },
+                );
+              },
+            ),
+    );
+  }
+
+  Widget buildFAB() {
+    return FloatingActionButton(
+      child: Icon(Icons.add),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AddPersonalRecord(db: widget.db)),
+        ).then((value) async {
+          await getRecords();
+        });
+      },
+    );
+  }
+
+  Widget buildAddRecord() {
+    // move this to a new page
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              decoration: InputDecoration(
+                hintText: 'Player Tag',
+              ),
+              onSaved: (tag) {
+                // save tag
+              },
+              validator: (tag) {
+                if (tag!.isEmpty)
+                  return 'Player Tag cannot be empty';
+                else
+                  return null;
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Background(
       child: Scaffold(
         body: buildBody(),
+        floatingActionButton: buildFAB(),
       ),
     );
   }

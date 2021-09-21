@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/models/tournament.dart';
 
 class TournamentScreen extends StatefulWidget {
@@ -320,11 +321,13 @@ class _TournamentScreenState extends State<TournamentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.tournament.tournamentName} Set'),
+    return Background(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('${widget.tournament.tournamentName} Set'),
+        ),
+        body: buildBody(),
       ),
-      body: buildBody(),
     );
   }
 }

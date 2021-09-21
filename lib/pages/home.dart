@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/pages/personal_set_records.dart';
 import 'package:smash_app/pages/random_character_generator.dart';
 import 'package:smash_app/pages/random_stage_generator.dart';
@@ -82,28 +83,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // smooth dark gradient background
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF1A1A1A),
-            Color(0xFF2D2D2D),
-            Color(0xFF3A3A3A),
-            Color(0xFF4F4F4F),
-            Color(0xFF636363),
-            Color(0xFF7A7A7A),
-            Color(0xFF919191),
-            Color(0xFFA6A6A6),
-            Color(0xFFBBBBBB),
-            Color(0xFFD0D0D0),
-            Color(0xFFE6E6E6),
-            Color(0xFFFBFBFB),
-          ],
-        ),
-      ),
+    return Background(
       child: Scaffold(
         body: buildBody(),
       ),
