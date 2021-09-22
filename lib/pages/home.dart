@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/pages/personal_set_records.dart';
 import 'package:smash_app/pages/random_character_generator.dart';
 import 'package:smash_app/pages/random_stage_generator.dart';
@@ -66,8 +69,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: buildBody(),
+    return Background(
+      child: Scaffold(
+        body: buildBody(),
+      ),
     );
   }
 }

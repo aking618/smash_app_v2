@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/models/tournament.dart';
 
 class TournamentScreen extends StatefulWidget {
@@ -122,12 +123,6 @@ class _TournamentScreenState extends State<TournamentScreen> {
         strikesRemaining = 2;
       });
     }
-
-    List<String> testList =
-        widget.tournament.legalStages['starterStages'].cast<String>() +
-            widget.tournament.legalStages['counterpickStages'].cast<String>();
-
-    print(testList);
 
     return Center(
       child: Column(
@@ -326,11 +321,13 @@ class _TournamentScreenState extends State<TournamentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.tournament.tournamentName} Set'),
+    return Background(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('${widget.tournament.tournamentName} Set'),
+        ),
+        body: buildBody(),
       ),
-      body: buildBody(),
     );
   }
 }

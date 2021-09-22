@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/theme.dart';
 import 'package:smash_app/pages/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  bool debugMode = true;
+  if (debugMode) Paint.enableDithering = true;
+
   runApp(MyApp());
 }
 
@@ -11,9 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Smash App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: appTheme(context),
       home: Home(),
     );
   }
