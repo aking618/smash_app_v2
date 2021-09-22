@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/models/rcg_character.dart';
 import 'package:smash_app/services/db.dart';
 
@@ -111,7 +112,13 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
     return Column(
       children: [
         buildImage(),
-        Text(selectedCharacter?.displayName ?? ""),
+        Text(
+          selectedCharacter?.displayName ?? "",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }
@@ -123,6 +130,9 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
 
     // cache resulting image to local storage
     return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black),
+      ),
       child: CachedNetworkImage(
         placeholder: (context, url) => CircularProgressIndicator(),
         imageUrl: imageUrl + selectedCharacter!.filePath + ".png",
@@ -135,7 +145,7 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
   }
 
   buildRandomizeButton() {
-    return TextButton(
+    return ElevatedButton(
       onPressed: () {
         Random rand = new Random();
         setState(() =>
@@ -149,7 +159,7 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Background(
       child: Scaffold(
         body: buildBody(),
       ),

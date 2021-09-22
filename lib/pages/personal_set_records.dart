@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/constants.dart';
+import 'package:smash_app/constants/player_card.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/pages/add_person_record.dart';
 import 'package:smash_app/services/db.dart';
@@ -30,11 +31,19 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
   Future<void> getRecords() async {
     var records = await SmashAppDatabase().getPlayerRecordList(widget.db);
     records.isEmpty
-        ? print('No records found')
+        ? resetState()
         : setState(() {
             _records = records;
             _filteredRecords = records;
           });
+  }
+
+  void resetState() {
+    print('No records found');
+    setState(() {
+      _records = [];
+      _filteredRecords = [];
+    });
   }
 
   Widget buildBody() {
@@ -70,10 +79,44 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
             icon: Icon(Icons.help_outline),
             onPressed: () {
               // show help dialog
+              showHelpDialog();
             },
           ),
         ],
       ),
+    );
+  }
+
+  void showHelpDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Personal Set Records',
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          content: Container(
+            child: Text(
+              '- This page shows all the personal set records created by you.\n' +
+                  '- You can add new records by clicking the + button.\n' +
+                  '- You can also search for records by typing in the search bar.\n' +
+                  '- Tap on a record to see more details and edit the record.',
+              textAlign: TextAlign.start,
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -107,12 +150,9 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
           : ListView.builder(
               itemCount: _filteredRecords.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_filteredRecords[index].playerTag),
-                  onTap: () {
-                    // editRecord(_filteredRecords[index]);
-                  },
-                );
+                return PlayerCard(
+                    playerRecord: _filteredRecords[index],
+                    removeRecord: removeRecord);
               },
             ),
     );
@@ -125,7 +165,10 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => AddPersonalRecord(db: widget.db)),
+              builder: (context) => AddPersonalRecord(
+                    db: widget.db,
+                    playerId: _records.length + 1,
+                  )),
         ).then((value) async {
           await getRecords();
         });
@@ -159,6 +202,11 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
         ),
       ),
     );
+  }
+
+  Future<void> removeRecord(int id) async {
+    await SmashAppDatabase().deletePlayerRecord(widget.db, id);
+    await getRecords();
   }
 
   @override

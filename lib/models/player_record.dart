@@ -34,9 +34,21 @@ class PlayerRecord {
     return PlayerRecord(
       id: map['id'],
       playerTag: map['playerTag'],
+      characters: map['characters'],
+      notes: map['notes'],
+      wins: map['wins'],
+      losses: map['losses'],
+    );
+  }
+
+  static PlayerRecord fromSqlfliteMap(Map<String, dynamic> map) {
+    return PlayerRecord(
+      id: map['id'],
+      playerTag: map['playerTag'],
       characters: jsonDecode(map['characters'])
-          .map<RCGCharacter>((c) => RCGCharacter.fromMap(c))
-          .toList(),
+          .map((c) => RCGCharacter.fromMap(c))
+          .toList()
+          .cast<RCGCharacter>(),
       notes: map['notes'],
       wins: map['wins'],
       losses: map['losses'],
@@ -45,7 +57,7 @@ class PlayerRecord {
 
   static List<PlayerRecord> fromMapList(List<dynamic> mapList) {
     if (mapList.isEmpty) return [];
-    return List<PlayerRecord>.from(mapList.map((m) => fromMap(m)));
+    return List<PlayerRecord>.from(mapList.map((m) => fromSqlfliteMap(m)));
   }
 
   @override

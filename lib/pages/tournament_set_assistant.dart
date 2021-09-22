@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/constants.dart';
 import 'package:smash_app/models/tournament.dart';
+import 'package:smash_app/pages/add_tournament.dart';
 import 'package:smash_app/pages/tournament_screen.dart';
 import 'package:smash_app/services/db.dart';
 
@@ -46,11 +48,40 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   buildBody() {
     return Container(
       padding: EdgeInsets.all(16.0),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: buildTASOptions(),
-        ),
+      child: Column(
+        children: [
+          buildHeader(),
+          ...buildTASOptions(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildHeader() {
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          Text(
+            'Tournament Assistant',
+            style: TextStyle(
+              fontSize: 20.0,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: () {
+              print('Help');
+            },
+          ),
+        ],
       ),
     );
   }
@@ -62,7 +93,14 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
       ElevatedButton(
         child: Text('Create New Tournament'),
         onPressed: () {
-          showDialogForNewTournament();
+          // showDialogForNewTournament();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddTournament(
+                  db: widget.db, createTournament: createNewTournament),
+            ),
+          );
         },
       ),
     ];
@@ -506,11 +544,10 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Tournament Assistant'),
+      child: Background(
+        child: Scaffold(
+          body: buildBody(),
         ),
-        body: buildBody(),
       ),
     );
   }

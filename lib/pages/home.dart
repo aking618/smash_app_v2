@@ -42,20 +42,6 @@ class _HomeState extends State<Home> {
     return homeBtns.entries.map((entries) {
       return ElevatedButton(
         child: Text(entries.key),
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
-          elevation: MaterialStateProperty.all<double>(8.0),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-          ),
-          textStyle: MaterialStateProperty.all<TextStyle>(
-            TextStyle(
-              fontSize: 20.0,
-            ),
-          ),
-        ),
         onPressed: () {
           navigateToPage(entries.value);
           ;
