@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -53,7 +54,17 @@ class _AddTournamentState extends State<AddTournament> {
   Widget buildValidateAndSaveTournamentButton() {
     return IconButton(
       icon: Icon(Icons.check),
-      onPressed: () {},
+      onPressed: () {
+        Fluttertoast.showToast(
+          msg: 'Tournament added',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      },
     );
   }
 
