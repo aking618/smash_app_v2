@@ -8,8 +8,10 @@ import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PlayerPage extends StatefulWidget {
-  final PlayerRecord playerRecord;
-  const PlayerPage({Key? key, required this.playerRecord}) : super(key: key);
+  PlayerRecord playerRecord;
+  Function onUpdate;
+  PlayerPage({Key? key, required this.playerRecord, required this.onUpdate})
+      : super(key: key);
 
   @override
   _PlayerPageState createState() => _PlayerPageState();
@@ -37,17 +39,19 @@ class _PlayerPageState extends State<PlayerPage> {
 
   Widget buildBody() {
     return Container(
-      child: Column(
-        children: <Widget>[
-          buildBackButton(),
-          buildPlayerTag(),
-          buildHorizontalDivider(),
-          buildSetCount(),
-          buildHorizontalDivider(),
-          buildCharacterList(),
-          buildHorizontalDivider(),
-          buildNotes(),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            buildBackButton(),
+            buildPlayerTag(),
+            buildHorizontalDivider(),
+            buildSetCount(),
+            buildHorizontalDivider(),
+            buildCharacterList(),
+            buildHorizontalDivider(),
+            buildNotes(),
+          ],
+        ),
       ),
     );
   }
@@ -102,24 +106,47 @@ class _PlayerPageState extends State<PlayerPage> {
     return Container(
       margin: EdgeInsets.only(top: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Text(
-            "Set Count: ",
+            "Set Count: ${widget.playerRecord.wins} - ${widget.playerRecord.losses}",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            "${widget.playerRecord.wins} - ${widget.playerRecord.losses}",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          buildAddIconButton(),
+          buildSubIconButton(),
         ],
       ),
+    );
+  }
+
+  Column buildSubIconButton() {
+    return Column(
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.remove),
+          onPressed: () async {
+            await updatePlayerLoss();
+          },
+        ),
+        Text("Add Loss"),
+      ],
+    );
+  }
+
+  Column buildAddIconButton() {
+    return Column(
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () async {
+            await updatePlayerWin();
+          },
+        ),
+        Text("Add Win"),
+      ],
     );
   }
 
@@ -245,8 +272,51 @@ class _PlayerPageState extends State<PlayerPage> {
     Database db = await SmashAppDatabase().intializedDB();
     await SmashAppDatabase().updatePlayerRecord(db, updatedPlayerRecord);
 
+    widget.onUpdate(updatedPlayerRecord);
+
     setState(() {
       _isEditing = false;
+      widget.playerRecord = updatedPlayerRecord;
+    });
+  }
+
+  Future<void> updatePlayerLoss() async {
+    PlayerRecord updatedPlayerRecord = PlayerRecord(
+      playerTag: _playerTagController.text,
+      notes: _notesController.text,
+      characters: widget.playerRecord.characters,
+      wins: widget.playerRecord.wins,
+      losses: widget.playerRecord.losses + 1,
+      id: widget.playerRecord.id,
+    );
+    // get the database
+    Database db = await SmashAppDatabase().intializedDB();
+    await SmashAppDatabase().updatePlayerRecord(db, updatedPlayerRecord);
+
+    widget.onUpdate(updatedPlayerRecord);
+
+    setState(() {
+      widget.playerRecord = updatedPlayerRecord;
+    });
+  }
+
+  Future<void> updatePlayerWin() async {
+    PlayerRecord updatedPlayerRecord = PlayerRecord(
+      playerTag: _playerTagController.text,
+      notes: _notesController.text,
+      characters: widget.playerRecord.characters,
+      wins: widget.playerRecord.wins + 1,
+      losses: widget.playerRecord.losses,
+      id: widget.playerRecord.id,
+    );
+    // get the database
+    Database db = await SmashAppDatabase().intializedDB();
+    await SmashAppDatabase().updatePlayerRecord(db, updatedPlayerRecord);
+
+    widget.onUpdate(updatedPlayerRecord);
+
+    setState(() {
+      widget.playerRecord = updatedPlayerRecord;
     });
   }
 
@@ -256,7 +326,6 @@ class _PlayerPageState extends State<PlayerPage> {
       child: Scaffold(
         body: buildBody(),
         floatingActionButton: getFAB(),
-        resizeToAvoidBottomInset: true,
       ),
     );
   }

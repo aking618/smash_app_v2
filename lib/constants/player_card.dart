@@ -6,10 +6,9 @@ import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PlayerCard extends StatefulWidget {
-  final PlayerRecord playerRecord;
+  PlayerRecord playerRecord;
   final Future<void> Function(int id) removeRecord;
-  const PlayerCard(
-      {Key? key, required this.playerRecord, required this.removeRecord})
+  PlayerCard({Key? key, required this.playerRecord, required this.removeRecord})
       : super(key: key);
 
   @override
@@ -172,10 +171,18 @@ class _PlayerCardState extends State<PlayerCard> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  PlayerPage(playerRecord: widget.playerRecord),
+              builder: (context) => PlayerPage(
+                playerRecord: widget.playerRecord,
+                onUpdate: updatePlayerRecord,
+              ),
             ),
           );
         });
+  }
+
+  void updatePlayerRecord(PlayerRecord playerRecord) {
+    setState(() {
+      widget.playerRecord = playerRecord;
+    });
   }
 }
