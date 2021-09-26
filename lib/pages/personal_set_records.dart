@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:smash_app/constants/background.dart';
-import 'package:smash_app/constants/constants.dart';
 import 'package:smash_app/constants/player_card.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/pages/add_person_record.dart';
