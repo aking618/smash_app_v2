@@ -142,10 +142,6 @@ class _AddPersonalRecordState extends State<AddPersonalRecord> {
             entries['characters'] = chosenCharacters;
           });
 
-          // print type of entries['characters']
-          print(entries['characters']);
-          print(entries['characters'].runtimeType);
-
           PlayerRecord playerRecord = PlayerRecord.fromMap(entries);
           await SmashAppDatabase().insertPlayerRecord(widget.db, playerRecord);
           Navigator.pop(context);

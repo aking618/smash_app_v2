@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/constants.dart';
+import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/tournament.dart';
 import 'package:smash_app/pages/add_tournament.dart';
 import 'package:smash_app/pages/tournament_screen.dart';
 import 'package:smash_app/services/db.dart';
+import 'package:sqflite/sqflite.dart';
 
-class TournamentAssistant extends StatefulWidget {
-  final db;
-  const TournamentAssistant({Key? key, this.db}) : super(key: key);
+class TournamentAssistant extends ConsumerStatefulWidget {
+  const TournamentAssistant({Key? key}) : super(key: key);
 
   @override
   _TournamentAssistantState createState() => _TournamentAssistantState();
 }
 
-class _TournamentAssistantState extends State<TournamentAssistant> {
+class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
+  late Database _db;
   Tournament? selectedTournament;
   List<Tournament> tournaments = [];
   Map<String, dynamic> tournamentData = {};
@@ -29,11 +32,12 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   @override
   void initState() {
     super.initState();
+    _db = ref.read(dbProvider);
     loadTournaments();
   }
 
   Future<void> loadTournaments() async {
-    final tournaments = await SmashAppDatabase().getTournamentList(widget.db);
+    final tournaments = await SmashAppDatabase().getTournamentList(_db);
     if (tournaments.isEmpty) {
       print('No tournaments found');
       return;
@@ -97,8 +101,8 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddTournament(
-                  db: widget.db, createTournament: createNewTournament),
+              builder: (context) =>
+                  AddTournament(db: _db, createTournament: createNewTournament),
             ),
           );
         },
@@ -409,7 +413,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
 
     Tournament tournament = Tournament.fromMap(tournamentData);
 
-    await SmashAppDatabase().insertTournament(widget.db, tournament);
+    await SmashAppDatabase().insertTournament(_db, tournament);
 
     setState(() {
       tournaments = List.from(tournaments)..add(tournament);
@@ -501,8 +505,7 @@ class _TournamentAssistantState extends State<TournamentAssistant> {
   }
 
   Future<void> deleteTournament() async {
-    await SmashAppDatabase()
-        .deleteTournament(widget.db, selectedTournament!.id);
+    await SmashAppDatabase().deleteTournament(_db, selectedTournament!.id);
     setState(() {
       tournaments = List.from(tournaments)..remove(selectedTournament);
       selectedTournament = tournaments.isNotEmpty ? tournaments[0] : null;

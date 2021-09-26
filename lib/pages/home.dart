@@ -14,25 +14,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var db;
   Map<String, Widget> homeBtns = {};
 
   @override
   void initState() {
     super.initState();
-    initDatabase();
-  }
-
-  Future<void> initDatabase() async {
-    Database database = await SmashAppDatabase().intializedDB();
-    setState(() {
-      db = database;
-      homeBtns = {
-        "Random Character Generator": RandomCharacterGenerator(db: database),
-        "Tournament Set Assistant": TournamentAssistant(db: database),
-        "Personal Set Records": PersonalSetRecords(db: database),
-      };
-    });
+    homeBtns = {
+      'Random Character Generator': RandomCharacterGenerator(),
+      'Tournament Set Assistant': TournamentAssistant(),
+      'Personal Set Records': PersonalSetRecords(),
+    };
   }
 
   List<Widget> getHomeButtons() {
