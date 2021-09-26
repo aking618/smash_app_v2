@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:smash_app/models/player_record.dart';
+import 'package:smash_app/pages/player_page.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PlayerCard extends StatefulWidget {
-  final PlayerRecord playerRecord;
+  PlayerRecord playerRecord;
   final Future<void> Function(int id) removeRecord;
-  const PlayerCard(
-      {Key? key, required this.playerRecord, required this.removeRecord})
+  PlayerCard({Key? key, required this.playerRecord, required this.removeRecord})
       : super(key: key);
 
   @override
@@ -168,7 +168,21 @@ class _PlayerCardState extends State<PlayerCard> {
         ),
         onTap: () {
           //TODO: Add functionality to open player profile
-          print("Player: ${widget.playerRecord.playerTag} tapped");
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayerPage(
+                playerRecord: widget.playerRecord,
+                onUpdate: updatePlayerRecord,
+              ),
+            ),
+          );
         });
+  }
+
+  void updatePlayerRecord(PlayerRecord playerRecord) {
+    setState(() {
+      widget.playerRecord = playerRecord;
+    });
   }
 }
