@@ -6,7 +6,7 @@ import 'package:smash_app/models/tournament.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SmashAppDatabase {
-  intializedDB() async {
+  Future<Database> intializedDB() async {
     print('initializing database');
     return openDatabase(
       join(await getDatabasesPath(), 'smash_app.db'),
@@ -244,6 +244,7 @@ class SmashAppDatabase {
       where: 'id = ?',
       whereArgs: [playerRecord.id],
     );
+    print('updated player record');
   }
 
   Future<void> deletePlayerRecord(Database db, int id) async {
