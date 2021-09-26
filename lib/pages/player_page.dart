@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/models/player_record.dart';
-import 'package:smash_app/models/rcg_character.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';
 
+// ignore: must_be_immutable
 class PlayerPage extends StatefulWidget {
   PlayerRecord playerRecord;
   Function onUpdate;
