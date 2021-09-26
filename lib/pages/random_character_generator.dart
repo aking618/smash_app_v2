@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:smash_app/constants/background.dart';
-import 'package:smash_app/main.dart';
+import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/rcg_character.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';

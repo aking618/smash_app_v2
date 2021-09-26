@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/constants.dart';
-import 'package:smash_app/main.dart';
+import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/tournament.dart';
 import 'package:smash_app/pages/add_tournament.dart';
 import 'package:smash_app/pages/tournament_screen.dart';

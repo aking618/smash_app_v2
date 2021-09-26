@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
-import 'package:smash_app/main.dart';
+import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';

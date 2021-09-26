@@ -3,11 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/theme.dart';
 import 'package:smash_app/pages/home.dart';
 import 'package:smash_app/services/db.dart';
-import 'package:sqflite/sqflite.dart';
-
-final dbProvider = Provider<Database>((ref) {
-  throw Exception('Database not initialized');
-});
+import 'package:smash_app/services/providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
