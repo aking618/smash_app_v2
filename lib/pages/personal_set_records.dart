@@ -1,34 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/player_card.dart';
+import 'package:smash_app/main.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/pages/add_person_record.dart';
 import 'package:smash_app/services/db.dart';
+import 'package:sqflite/sqflite.dart';
 
-class PersonalSetRecords extends StatefulWidget {
-  final db;
-
-  const PersonalSetRecords({Key? key, this.db}) : super(key: key);
+class PersonalSetRecords extends ConsumerStatefulWidget {
+  const PersonalSetRecords({Key? key}) : super(key: key);
 
   @override
   _PersonalSetRecordsState createState() => _PersonalSetRecordsState();
 }
 
-class _PersonalSetRecordsState extends State<PersonalSetRecords> {
+class _PersonalSetRecordsState extends ConsumerState<PersonalSetRecords> {
   final _formKey = GlobalKey<FormState>();
   String? _searchText;
   List<PlayerRecord> _records = [];
   List<PlayerRecord> _filteredRecords = [];
+  late Database db;
 
   @override
   void initState() {
     super.initState();
     _searchText = '';
+    db = ref.read(dbProvider);
     getRecords();
   }
 
   Future<void> getRecords() async {
-    var records = await SmashAppDatabase().getPlayerRecordList(widget.db);
+    var records = await SmashAppDatabase().getPlayerRecordList(db);
     records.isEmpty
         ? resetState()
         : setState(() {
@@ -165,7 +168,7 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
           context,
           MaterialPageRoute(
               builder: (context) => AddPersonalRecord(
-                    db: widget.db,
+                    db: db,
                     playerId: _records.length + 1,
                   )),
         ).then((value) async {
@@ -204,7 +207,7 @@ class _PersonalSetRecordsState extends State<PersonalSetRecords> {
   }
 
   Future<void> removeRecord(int id) async {
-    await SmashAppDatabase().deletePlayerRecord(widget.db, id);
+    await SmashAppDatabase().deletePlayerRecord(db, id);
     await getRecords();
   }
 

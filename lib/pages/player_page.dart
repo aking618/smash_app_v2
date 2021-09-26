@@ -1,13 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
+import 'package:smash_app/main.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';
 
 // ignore: must_be_immutable
-class PlayerPage extends StatefulWidget {
+class PlayerPage extends ConsumerStatefulWidget {
   PlayerRecord playerRecord;
   Function onUpdate;
   PlayerPage({Key? key, required this.playerRecord, required this.onUpdate})
@@ -17,7 +19,8 @@ class PlayerPage extends StatefulWidget {
   _PlayerPageState createState() => _PlayerPageState();
 }
 
-class _PlayerPageState extends State<PlayerPage> {
+class _PlayerPageState extends ConsumerState<PlayerPage> {
+  late Database db;
   String imageUrl = "https://www.smashbros.com/assets_v2/img/fighter/thumb_a/";
   TextEditingController _playerTagController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
@@ -26,6 +29,7 @@ class _PlayerPageState extends State<PlayerPage> {
   @override
   void initState() {
     super.initState();
+    db = ref.read(dbProvider);
     _playerTagController.text = widget.playerRecord.playerTag;
     _notesController.text = widget.playerRecord.notes;
   }
@@ -117,6 +121,7 @@ class _PlayerPageState extends State<PlayerPage> {
           ),
           buildAddIconButton(),
           buildSubIconButton(),
+          buildResetIconButton(),
         ],
       ),
     );
@@ -146,6 +151,20 @@ class _PlayerPageState extends State<PlayerPage> {
           },
         ),
         Text("Add Win"),
+      ],
+    );
+  }
+
+  Column buildResetIconButton() {
+    return Column(
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.refresh),
+          onPressed: () async {
+            await updatePlayerReset();
+          },
+        ),
+        Text("Reset"),
       ],
     );
   }
@@ -194,7 +213,17 @@ class _PlayerPageState extends State<PlayerPage> {
 
   Widget buildNotes() {
     return Container(
+      padding: EdgeInsets.only(left: 8.0, right: 8.0),
       margin: EdgeInsets.only(top: 20),
+      width: MediaQuery.of(context).size.width * 0.9,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.black,
+          width: 1,
+        ),
+        color: Colors.black87,
+      ),
       child: _isEditing
           ? TextField(
               controller: _notesController,
@@ -205,6 +234,7 @@ class _PlayerPageState extends State<PlayerPage> {
               ),
             )
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Notes:",
@@ -289,8 +319,6 @@ class _PlayerPageState extends State<PlayerPage> {
       losses: widget.playerRecord.losses + 1,
       id: widget.playerRecord.id,
     );
-    // get the database
-    Database db = await SmashAppDatabase().intializedDB();
     await SmashAppDatabase().updatePlayerRecord(db, updatedPlayerRecord);
 
     widget.onUpdate(updatedPlayerRecord);
@@ -309,8 +337,24 @@ class _PlayerPageState extends State<PlayerPage> {
       losses: widget.playerRecord.losses,
       id: widget.playerRecord.id,
     );
-    // get the database
-    Database db = await SmashAppDatabase().intializedDB();
+    await SmashAppDatabase().updatePlayerRecord(db, updatedPlayerRecord);
+
+    widget.onUpdate(updatedPlayerRecord);
+
+    setState(() {
+      widget.playerRecord = updatedPlayerRecord;
+    });
+  }
+
+  Future<void> updatePlayerReset() async {
+    PlayerRecord updatedPlayerRecord = PlayerRecord(
+      playerTag: _playerTagController.text,
+      notes: _notesController.text,
+      characters: widget.playerRecord.characters,
+      wins: 0,
+      losses: 0,
+      id: widget.playerRecord.id,
+    );
     await SmashAppDatabase().updatePlayerRecord(db, updatedPlayerRecord);
 
     widget.onUpdate(updatedPlayerRecord);
