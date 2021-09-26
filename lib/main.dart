@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/theme.dart';
 import 'package:smash_app/pages/home.dart';
 import 'package:smash_app/services/db.dart';
@@ -13,9 +14,11 @@ void main() async {
 
   runApp(
     MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+      home: Background(
+        child: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
         ),
       ),
     ),
