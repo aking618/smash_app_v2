@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/player_card.dart';
+import 'package:smash_app/dialogs/dialog_page_enum.dart';
+import 'package:smash_app/dialogs/help_dialog.dart';
 import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/pages/add_person_record.dart';
@@ -81,44 +83,11 @@ class _PersonalSetRecordsState extends ConsumerState<PersonalSetRecords> {
             icon: Icon(Icons.help_outline),
             onPressed: () {
               // show help dialog
-              showHelpDialog();
+              showHelpDialog(context, DialogPage.personal_set_records);
             },
           ),
         ],
       ),
-    );
-  }
-
-  void showHelpDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Personal Set Records',
-            style: TextStyle(
-              fontSize: 20,
-            ),
-          ),
-          content: Container(
-            child: Text(
-              '- This page shows all the personal set records created by you.\n' +
-                  '- You can add new records by clicking the + button.\n' +
-                  '- You can also search for records by typing in the search bar.\n' +
-                  '- Tap on a record to see more details and edit the record.',
-              textAlign: TextAlign.start,
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
