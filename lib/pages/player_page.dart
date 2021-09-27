@@ -298,8 +298,6 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
       losses: widget.playerRecord.losses,
       id: widget.playerRecord.id,
     );
-    // get the database
-    Database db = await SmashAppDatabase().intializedDB();
     await SmashAppDatabase().updatePlayerRecord(db, updatedPlayerRecord);
 
     widget.onUpdate(updatedPlayerRecord);

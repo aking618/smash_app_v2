@@ -1,25 +1,25 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/models/rcg_character.dart';
 import 'package:smash_app/services/db.dart';
+import 'package:smash_app/services/providers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 
-class AddPersonalRecord extends StatefulWidget {
-  final Database db;
+class AddPersonalRecord extends ConsumerStatefulWidget {
   final int playerId;
-  const AddPersonalRecord({Key? key, required this.db, required this.playerId})
-      : super(key: key);
+  const AddPersonalRecord({Key? key, required this.playerId}) : super(key: key);
 
   @override
   _AddPersonalRecordState createState() => _AddPersonalRecordState();
 }
 
-class _AddPersonalRecordState extends State<AddPersonalRecord> {
+class _AddPersonalRecordState extends ConsumerState<AddPersonalRecord> {
   final _formKey = GlobalKey<FormState>();
   List<RCGCharacter> _characters = [];
   List<Widget> _characterDropdowns = [];
@@ -31,6 +31,7 @@ class _AddPersonalRecordState extends State<AddPersonalRecord> {
     'notes': '',
     'characters': [],
   };
+  late Database db;
 
   @override
   void initState() {
@@ -39,8 +40,10 @@ class _AddPersonalRecordState extends State<AddPersonalRecord> {
   }
 
   Future<void> getCharacters() async {
-    var rcgCharacterList =
-        await SmashAppDatabase().getRCGCharacterList(widget.db);
+    setState(() {
+      db = ref.read(dbProvider);
+    });
+    var rcgCharacterList = await SmashAppDatabase().getRCGCharacterList(db);
     if (rcgCharacterList.length == 0) {
       print("No RCG Characters found");
       final result = await retrieveOptions();
@@ -53,7 +56,7 @@ class _AddPersonalRecordState extends State<AddPersonalRecord> {
           "filePath": result["filePaths"][i],
         }));
       }
-      await SmashAppDatabase().insertRCGCharacterList(widget.db, characters);
+      await SmashAppDatabase().insertRCGCharacterList(db, characters);
       setState(() {
         _characters = characters;
       });
@@ -83,13 +86,15 @@ class _AddPersonalRecordState extends State<AddPersonalRecord> {
   }
 
   Widget buildBody(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          buildHeader(),
-          buildForm(),
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            buildHeader(),
+            buildForm(),
+          ],
+        ),
       ),
     );
   }
@@ -143,7 +148,7 @@ class _AddPersonalRecordState extends State<AddPersonalRecord> {
           });
 
           PlayerRecord playerRecord = PlayerRecord.fromMap(entries);
-          await SmashAppDatabase().insertPlayerRecord(widget.db, playerRecord);
+          await SmashAppDatabase().insertPlayerRecord(db, playerRecord);
           Navigator.pop(context);
         }
       },
@@ -225,9 +230,11 @@ class _AddPersonalRecordState extends State<AddPersonalRecord> {
                     value: character,
                     child: Text(
                       character.displayName,
+                      overflow: TextOverflow.ellipsis,
                     )))
                 .toList(),
             onChanged: (value) {
+              FocusScope.of(context).requestFocus(FocusNode());
               if (!chosenCharacters.contains(value)) {
                 setState(() {
                   chosenCharacters.add(value!);
