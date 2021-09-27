@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/pages/personal_set_records.dart';
 import 'package:smash_app/pages/random_character_generator.dart';
-import 'package:smash_app/pages/random_stage_generator.dart';
 import 'package:smash_app/pages/tournament_set_assistant.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';
@@ -17,25 +14,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var db;
   Map<String, Widget> homeBtns = {};
 
   @override
   void initState() {
     super.initState();
-    initDatabase();
-  }
-
-  Future<void> initDatabase() async {
-    Database database = await SmashAppDatabase().intializedDB();
-    setState(() {
-      db = database;
-      homeBtns = {
-        "Random Character Generator": RandomCharacterGenerator(db: database),
-        "Tournament Set Assistant": TournamentAssistant(db: database),
-        "Personal Set Records": PersonalSetRecords(db: database),
-      };
-    });
+    homeBtns = {
+      'Random Character Generator': RandomCharacterGenerator(),
+      'Tournament Set Assistant': TournamentAssistant(),
+      'Personal Set Records': PersonalSetRecords(),
+    };
   }
 
   List<Widget> getHomeButtons() {
@@ -44,7 +32,6 @@ class _HomeState extends State<Home> {
         child: Text(entries.key),
         onPressed: () {
           navigateToPage(entries.value);
-          ;
         },
       );
     }).toList();

@@ -3,21 +3,24 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:smash_app/constants/background.dart';
+import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/rcg_character.dart';
 import 'package:smash_app/services/db.dart';
+import 'package:sqflite/sqflite.dart';
 
-class RandomCharacterGenerator extends StatefulWidget {
-  final db;
-  const RandomCharacterGenerator({Key? key, this.db}) : super(key: key);
+class RandomCharacterGenerator extends ConsumerStatefulWidget {
+  const RandomCharacterGenerator({Key? key}) : super(key: key);
 
   @override
   _RandomCharacterGeneratorState createState() =>
       _RandomCharacterGeneratorState();
 }
 
-class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
+class _RandomCharacterGeneratorState
+    extends ConsumerState<RandomCharacterGenerator> {
   List<RCGCharacter> characters = [];
   RCGCharacter? selectedCharacter;
 
@@ -30,8 +33,8 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
   }
 
   Future<void> getOptions() async {
-    var rcgCharacterList =
-        await SmashAppDatabase().getRCGCharacterList(widget.db);
+    final Database db = ref.read(dbProvider);
+    var rcgCharacterList = await SmashAppDatabase().getRCGCharacterList(db);
     if (rcgCharacterList.length == 0) {
       print("No RCG Characters found");
       final result = await retrieveOptions();
@@ -44,7 +47,7 @@ class _RandomCharacterGeneratorState extends State<RandomCharacterGenerator> {
           "filePath": result["filePaths"][i],
         }));
       }
-      await SmashAppDatabase().insertRCGCharacterList(widget.db, characters);
+      await SmashAppDatabase().insertRCGCharacterList(db, characters);
       setState(() {
         this.characters = characters;
       });
