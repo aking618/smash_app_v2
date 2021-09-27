@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smash_app/constants/background.dart';
+import 'package:smash_app/dialogs/dialog_page_enum.dart';
+import 'package:smash_app/dialogs/help_dialog.dart';
+import 'package:smash_app/dialogs/tournament_dialogs.dart';
 import 'package:smash_app/models/tournament.dart';
 
 class TournamentScreen extends StatefulWidget {
@@ -47,7 +50,9 @@ class _TournamentScreenState extends State<TournamentScreen> {
               style: TextStyle(fontSize: 20.0)),
           IconButton(
             icon: Icon(Icons.help_outline),
-            onPressed: () {},
+            onPressed: () {
+              showHelpDialog(context, DialogPage.tournament_screen);
+            },
           ),
         ],
       ),
@@ -238,40 +243,23 @@ class _TournamentScreenState extends State<TournamentScreen> {
   }
 
   promptUserToConfirmPlayerChoice(int player) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm Player Choice'),
-          content: Text('Are you sure you want to choose this player?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Yes'),
-              onPressed: () {
-                if (player == 0) {
-                  setState(() {
-                    player1Score++;
-                  });
-                } else {
-                  setState(() {
-                    player2Score++;
-                  });
-                }
-                Navigator.of(context).pop();
-                setState(() {
-                  playingMatch = false;
-                  choosingStage = true;
-                });
-              },
-            ),
-            TextButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+    showConfirmDialog(
+      context,
+      DialogType.confirm_player_win,
+      {
+        'Yes': () {
+          setState(() {
+            if (player == 0) {
+              player1Score++;
+            } else {
+              player2Score++;
+            }
+
+            playingMatch = false;
+            choosingStage = true;
+          });
+        },
+        'No': () {},
       },
     );
   }
@@ -300,28 +288,14 @@ class _TournamentScreenState extends State<TournamentScreen> {
   }
 
   Future<dynamic> buildResetDialog() {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm Reset'),
-          content: Text('Are you sure you want to start another set?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Yes'),
-              onPressed: () {
-                resetState();
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+    return showConfirmDialog(
+      context,
+      DialogType.reset_set,
+      {
+        'Yes': () {
+          resetState();
+        },
+        'No': () {},
       },
     );
   }

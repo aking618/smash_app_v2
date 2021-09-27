@@ -271,9 +271,10 @@ class _AddTournamentState extends ConsumerState<AddTournament> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Container(
-            width: MediaQuery.of(context).size.width / 2,
+            width: MediaQuery.of(context).size.width / 1.75,
             child: DropdownButtonFormField<String>(
               value: null,
+              isExpanded: true,
               onChanged: (value) {
                 FocusScope.of(context).requestFocus(FocusNode());
                 switch (label) {

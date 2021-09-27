@@ -24,13 +24,17 @@ class _TournamentCardState extends State<TournamentCard> {
             icon: Icon(Icons.edit),
             onPressed: () {
               // TODO: implement edit tournament
+              // Naviage to edit tournament screen
+              // and populate with tournament data
             },
           ),
-          Text(
-            widget.tournament.tournamentName,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          RichText(
+            text: TextSpan(
+              text: '${widget.tournament.tournamentName}',
+              style: TextStyle(
+                fontSize: 20.0,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ),
           IconButton(
@@ -109,6 +113,16 @@ class _TournamentCardState extends State<TournamentCard> {
     );
   }
 
+  Widget buildHorizontalDivider(double margin) {
+    return Container(
+      margin: EdgeInsets.only(bottom: margin),
+      child: Divider(
+        color: Colors.white70,
+        height: 1,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -120,6 +134,7 @@ class _TournamentCardState extends State<TournamentCard> {
             children: [
               buildTournamentHeaderRow(),
               buildMatchInfo(),
+              buildHorizontalDivider(4.0),
               buildStages(),
             ],
           ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/tournament_card.dart';
+import 'package:smash_app/dialogs/dialog_page_enum.dart';
+import 'package:smash_app/dialogs/help_dialog.dart';
 import 'package:smash_app/pages/add_tournament.dart';
 import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/tournament.dart';
@@ -84,7 +86,7 @@ class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
           IconButton(
             icon: Icon(Icons.help_outline),
             onPressed: () {
-              print('Help');
+              showHelpDialog(context, DialogPage.tournament_set_assistant);
             },
           ),
         ],
