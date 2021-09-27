@@ -26,8 +26,29 @@ class _TournamentScreenState extends State<TournamentScreen> {
     return Container(
       child: Column(
         children: [
+          buildHeader(),
           buildCurrentScore(),
           buildCurrentStep(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildHeader() {
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context)),
+          Text(widget.tournament.tournamentName,
+              style: TextStyle(fontSize: 20.0)),
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: () {},
+          ),
         ],
       ),
     );
@@ -323,9 +344,6 @@ class _TournamentScreenState extends State<TournamentScreen> {
   Widget build(BuildContext context) {
     return Background(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('${widget.tournament.tournamentName} Set'),
-        ),
         body: buildBody(),
       ),
     );

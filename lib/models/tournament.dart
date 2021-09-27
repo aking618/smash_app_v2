@@ -7,7 +7,6 @@ class Tournament {
   final Map<String, dynamic> legalStages;
   final int stockCount;
   final int timeInMinutes;
-  final List<String> additionalRules;
 
   Tournament({
     required this.id,
@@ -16,7 +15,6 @@ class Tournament {
     required this.legalStages,
     required this.stockCount,
     required this.timeInMinutes,
-    required this.additionalRules,
   });
 
   Map<String, dynamic> toMap() {
@@ -27,7 +25,6 @@ class Tournament {
       'legalStages': jsonEncode(legalStages),
       'stockCount': stockCount,
       'timeInMinutes': timeInMinutes,
-      'additionalRules': jsonEncode(additionalRules),
     };
   }
 
@@ -39,7 +36,6 @@ class Tournament {
       legalStages: map['legalStages'],
       stockCount: map['stockCount'],
       timeInMinutes: map['timeInMinutes'],
-      additionalRules: map['additionalRules'],
     );
   }
 
@@ -51,7 +47,6 @@ class Tournament {
       legalStages: jsonDecode(map['legalStages']).cast<String, dynamic>(),
       stockCount: map['stockCount'],
       timeInMinutes: map['timeInMinutes'],
-      additionalRules: jsonDecode(map['additionalRules']).cast<String>(),
     );
   }
 
@@ -63,6 +58,6 @@ class Tournament {
 
   @override
   String toString() {
-    return 'Tournament{id: $id, tournamentName: $tournamentName, setLengths: $setLengths, legalStages: $legalStages, stockCount: $stockCount, timeInMinutes: $timeInMinutes, additionalRules: $additionalRules}';
+    return 'Tournament{id: $id, tournamentName: $tournamentName, setLengths: $setLengths, legalStages: $legalStages, stockCount: $stockCount, timeInMinutes: $timeInMinutes}';
   }
 }
