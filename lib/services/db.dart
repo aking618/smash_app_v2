@@ -32,8 +32,7 @@ class SmashAppDatabase {
           setLengths text not null,
           legalStages text not null,
           stockCount integer not null,
-          timeInMinutes integer not null,
-          additionalRules text not null
+          timeInMinutes integer not null
         )
         ''');
         await db.execute('''
@@ -81,8 +80,7 @@ class SmashAppDatabase {
           setLengths text not null,
           legalStages text not null,
           stockCount integer not null,
-          timeInMinutes integer not null,
-          additionalRules text not null
+          timeInMinutes integer not null
         )
         ''');
         await db.execute('''
@@ -96,7 +94,7 @@ class SmashAppDatabase {
         )
         ''');
       },
-      version: 4,
+      version: 5,
     );
   }
 
