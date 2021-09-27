@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/background.dart';
-import 'package:smash_app/constants/constants.dart';
 import 'package:smash_app/constants/tournament_card.dart';
 import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/tournament.dart';
-import 'package:smash_app/pages/add_tournament.dart';
-import 'package:smash_app/pages/tournament_screen.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -17,11 +14,11 @@ class TournamentAssistant extends ConsumerStatefulWidget {
   _TournamentAssistantState createState() => _TournamentAssistantState();
 }
 
-
 class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
   late Database _db;
   Tournament? selectedTournament;
   List<Tournament> tournaments = [];
+  String? _searchText;
   List<Tournament> filteredTournaments = [];
 
   @override
@@ -123,7 +120,6 @@ class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
           : ListView.builder(
               itemCount: filteredTournaments.length,
               itemBuilder: (context, index) {
-                // TODO: make tournament card widget
                 return TournamentCard(
                   tournament: filteredTournaments[index],
                   deleteTournament: deleteTournament,
@@ -148,7 +144,7 @@ class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
 
   Future<void> deleteTournament(Tournament tournament) async {
     await SmashAppDatabase().deleteTournament(_db, tournament.id);
-    
+
     setState(() {
       tournaments = List.from(tournaments)..remove(tournament);
       filteredTournaments = List.from(filteredTournaments)..remove(tournament);
@@ -156,7 +152,7 @@ class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
   }
 
   // TODO: build FAB to add tournament
-  Widget buildFloatingActionButton() {
+  Widget buildFAB() {
     return Container();
   }
 

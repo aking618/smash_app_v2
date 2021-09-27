@@ -3,8 +3,6 @@ import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/pages/personal_set_records.dart';
 import 'package:smash_app/pages/random_character_generator.dart';
 import 'package:smash_app/pages/tournament_set_assistant.dart';
-import 'package:smash_app/services/db.dart';
-import 'package:sqflite/sqflite.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);

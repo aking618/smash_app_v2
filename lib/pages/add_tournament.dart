@@ -165,7 +165,6 @@ class _AddTournamentState extends State<AddTournament> {
         return null;
       },
       onSaved: (value) {
-        // TODO: save tournament name
         setState(() {
           tournamentData['tournamentName'] = value;
         });
