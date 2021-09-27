@@ -85,14 +85,24 @@ class _TournamentCardState extends State<TournamentCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Starter Stages', style: TextStyle(fontSize: 16)),
-            Text('${widget.tournament.legalStages['starterStages']}'),
+            ...widget.tournament.legalStages['starterStages'].map((stage) {
+              return Text(
+                " - " + stage,
+                overflow: TextOverflow.ellipsis,
+              );
+            }).toList(),
           ],
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Counterpick Stages', style: TextStyle(fontSize: 16)),
-            Text('${widget.tournament.legalStages['counterpickStages']}'),
+            ...widget.tournament.legalStages['counterpickStages'].map((stage) {
+              return Text(
+                " - " + stage,
+                overflow: TextOverflow.ellipsis,
+              );
+            }).toList(),
           ],
         ),
       ],

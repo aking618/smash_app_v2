@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/constants.dart';
+import 'package:smash_app/models/tournament.dart';
+import 'package:smash_app/services/db.dart';
+import 'package:smash_app/services/providers.dart';
 import 'package:sqflite/sqflite.dart';
 
-class AddTournament extends StatefulWidget {
-  final Database db;
-  final Function createTournament;
-  const AddTournament(
-      {Key? key, required this.db, required this.createTournament})
-      : super(key: key);
+class AddTournament extends ConsumerStatefulWidget {
+  final int tournamentId;
+  const AddTournament({
+    Key? key,
+    required this.tournamentId,
+  }) : super(key: key);
 
   @override
   _AddTournamentState createState() => _AddTournamentState();
 }
 
-class _AddTournamentState extends State<AddTournament> {
+class _AddTournamentState extends ConsumerState<AddTournament> {
   final _formKey = GlobalKey<FormState>();
   List<Widget> starterStages = [];
   List<Widget> counterpickStages = [];
@@ -30,15 +34,25 @@ class _AddTournamentState extends State<AddTournament> {
     'stockCount': 0,
     'timeInMinutes': 0,
   };
+  late Database db;
+
+  @override
+  void initState() {
+    super.initState();
+    db = ref.read(dbProvider);
+    tournamentData['id'] = widget.tournamentId;
+  }
 
   Widget buildBody(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          buildHeader(),
-          buildForm(),
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            buildHeader(),
+            buildForm(),
+          ],
+        ),
       ),
     );
   }
@@ -92,7 +106,9 @@ class _AddTournamentState extends State<AddTournament> {
             };
           });
 
-          await widget.createTournament(tournamentData);
+          Tournament tournament = Tournament.fromMap(tournamentData);
+          await SmashAppDatabase().insertTournament(db, tournament);
+
           Fluttertoast.showToast(
             msg: 'Tournament added',
             toastLength: Toast.LENGTH_SHORT,
@@ -259,6 +275,7 @@ class _AddTournamentState extends State<AddTournament> {
             child: DropdownButtonFormField<String>(
               value: null,
               onChanged: (value) {
+                FocusScope.of(context).requestFocus(FocusNode());
                 switch (label) {
                   case 'Starter Stage':
                     if (!starterStages.contains(value)) {
@@ -279,7 +296,10 @@ class _AddTournamentState extends State<AddTournament> {
               items: stageNameList.map((stage) {
                 return DropdownMenuItem<String>(
                   value: stage,
-                  child: Text(stage),
+                  child: Text(
+                    stage,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 );
               }).toList(),
             ),

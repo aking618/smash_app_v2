@@ -168,7 +168,6 @@ class _PersonalSetRecordsState extends ConsumerState<PersonalSetRecords> {
           context,
           MaterialPageRoute(
               builder: (context) => AddPersonalRecord(
-                    db: db,
                     playerId: _records.length + 1,
                   )),
         ).then((value) async {

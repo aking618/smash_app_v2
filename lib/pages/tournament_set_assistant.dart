@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/tournament_card.dart';
+import 'package:smash_app/pages/add_tournament.dart';
 import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/tournament.dart';
 import 'package:smash_app/services/db.dart';
@@ -129,19 +130,6 @@ class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
     );
   }
 
-  Future<void> createNewTournament(Map<String, dynamic> tourneyMap) async {
-    tourneyMap['id'] = tournaments.length + 1;
-
-    Tournament tournament = Tournament.fromMap(tourneyMap);
-
-    await SmashAppDatabase().insertTournament(_db, tournament);
-
-    setState(() {
-      tournaments = List.from(tournaments)..add(tournament);
-      filteredTournaments = List.from(filteredTournaments)..add(tournament);
-    });
-  }
-
   Future<void> deleteTournament(Tournament tournament) async {
     await SmashAppDatabase().deleteTournament(_db, tournament.id);
 
@@ -153,7 +141,20 @@ class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
 
   // TODO: build FAB to add tournament
   Widget buildFAB() {
-    return Container();
+    return FloatingActionButton(
+      child: Icon(Icons.add),
+      onPressed: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddTournament(
+                tournamentId: tournaments.length + 1,
+              ),
+            )).then((tourneyMap) async {
+          await loadTournaments();
+        });
+      },
+    );
   }
 
   @override
