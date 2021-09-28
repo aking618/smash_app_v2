@@ -83,7 +83,8 @@ class _PersonalSetRecordsState extends ConsumerState<PersonalSetRecords> {
             icon: Icon(Icons.help_outline),
             onPressed: () {
               // show help dialog
-              showHelpDialog(context, DialogPage.personal_set_records);
+              CustomDialog()
+                  .showHelpDialog(context, DialogPage.personal_set_records);
             },
           ),
         ],

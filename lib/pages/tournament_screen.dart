@@ -51,7 +51,8 @@ class _TournamentScreenState extends State<TournamentScreen> {
           IconButton(
             icon: Icon(Icons.help_outline),
             onPressed: () {
-              showHelpDialog(context, DialogPage.tournament_screen);
+              CustomDialog()
+                  .showHelpDialog(context, DialogPage.tournament_screen);
             },
           ),
         ],

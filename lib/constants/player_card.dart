@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/pages/player_page.dart';
+import 'package:smash_app/toasts/custom_toast.dart';
 
 // ignore: must_be_immutable
 class PlayerCard extends StatefulWidget {
@@ -137,6 +138,7 @@ class _PlayerCardState extends State<PlayerCard> {
         child: Text("Delete"),
         onPressed: () async {
           await widget.removeRecord(widget.playerRecord.id);
+          CustomToast().show("Player Record Removed", ToastType.success);
           Navigator.of(context).pop();
         },
       ),

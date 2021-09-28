@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/services/db.dart';
+import 'package:smash_app/toasts/custom_toast.dart';
 import 'package:sqflite/sqflite.dart';
 
 // ignore: must_be_immutable
@@ -274,15 +274,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
 
   Future<void> updatePlayerRecord() async {
     if (_playerTagController.text.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Player Tag cannot be empty",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      CustomToast().show("Player Tag connot be empty", ToastType.error);
       return;
     }
 
@@ -306,6 +298,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
       _isEditing = false;
       widget.playerRecord = updatedPlayerRecord;
     });
+
+    CustomToast().show("Player Record Updated", ToastType.success);
   }
 
   Future<void> updatePlayerLoss() async {
@@ -324,6 +318,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     setState(() {
       widget.playerRecord = updatedPlayerRecord;
     });
+
+    CustomToast().show("Player Record Updated", ToastType.success);
   }
 
   Future<void> updatePlayerWin() async {
@@ -342,6 +338,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     setState(() {
       widget.playerRecord = updatedPlayerRecord;
     });
+
+    CustomToast().show("Player Record Updated", ToastType.success);
   }
 
   Future<void> updatePlayerReset() async {
@@ -360,6 +358,8 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     setState(() {
       widget.playerRecord = updatedPlayerRecord;
     });
+
+    CustomToast().show("Player Record Updated", ToastType.success);
   }
 
   @override
