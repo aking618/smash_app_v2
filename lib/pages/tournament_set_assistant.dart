@@ -86,7 +86,8 @@ class _TournamentAssistantState extends ConsumerState<TournamentAssistant> {
           IconButton(
             icon: Icon(Icons.help_outline),
             onPressed: () {
-              showHelpDialog(context, DialogPage.tournament_set_assistant);
+              CustomDialog()
+                  .showHelpDialog(context, DialogPage.tournament_set_assistant);
             },
           ),
         ],

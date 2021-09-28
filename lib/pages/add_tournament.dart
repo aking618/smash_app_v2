@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/constants.dart';
 import 'package:smash_app/models/tournament.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:smash_app/services/providers.dart';
+import 'package:smash_app/toasts/custom_toast.dart';
 import 'package:sqflite/sqflite.dart';
 
 class AddTournament extends ConsumerStatefulWidget {
@@ -87,14 +87,9 @@ class _AddTournamentState extends ConsumerState<AddTournament> {
           _formKey.currentState!.save();
 
           if (chosenStarters.isEmpty || chosenCounterpicks.isEmpty) {
-            Fluttertoast.showToast(
-              msg: 'Please select at least one starter and one counterpick',
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0,
+            CustomToast().show(
+              "Please select at least one starter and one counterpick",
+              ToastType.error,
             );
             return;
           }
@@ -109,15 +104,8 @@ class _AddTournamentState extends ConsumerState<AddTournament> {
           Tournament tournament = Tournament.fromMap(tournamentData);
           await SmashAppDatabase().insertTournament(db, tournament);
 
-          Fluttertoast.showToast(
-            msg: 'Tournament added',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+          CustomToast().show("Tournament added", ToastType.success);
+
           Navigator.pop(context);
         }
       },

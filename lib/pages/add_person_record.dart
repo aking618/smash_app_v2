@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/models/rcg_character.dart';
 import 'package:smash_app/services/db.dart';
 import 'package:smash_app/services/providers.dart';
+import 'package:smash_app/toasts/custom_toast.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 
@@ -129,16 +129,8 @@ class _AddPersonalRecordState extends ConsumerState<AddPersonalRecord> {
           _formKey.currentState!.save();
 
           if (chosenCharacters.length == 0) {
-            Fluttertoast.showToast(
-              msg: "Please select at least one character",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
-
+            CustomToast()
+                .show("Please select at least one character", ToastType.error);
             return;
           }
 

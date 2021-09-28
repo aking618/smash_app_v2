@@ -1,52 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:smash_app/dialogs/dialog_page_enum.dart';
 
-Future<void> showHelpDialog(BuildContext context, DialogPage page) async {
-  String title = getTitle(page);
-  String content = getContent(page);
-  return showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title, style: TextStyle(fontSize: 20)),
-        content: Container(
-          child: Text(
-            content,
-            textAlign: TextAlign.start,
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
+class CustomDialog {
+  void showHelpDialog(BuildContext context, DialogPage page) {
+    String title = _getTitle(page);
+    String content = _getContent(page);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title, style: TextStyle(fontSize: 20)),
+          content: Container(
             child: Text(
-              'OK',
-              style: TextStyle(
-                fontSize: 20,
-              ),
+              content,
+              textAlign: TextAlign.start,
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
           ),
-        ],
-      );
-    },
-  );
-}
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-String getTitle(DialogPage page) {
-  switch (page) {
-    case DialogPage.personal_set_records:
-      return 'Personal Set Records';
-    case DialogPage.tournament_set_assistant:
-      return 'Tournament Set Assistant';
-    case DialogPage.tournament_screen:
-      return 'Tournament Set';
-    default:
-      return '';
+  String _getTitle(DialogPage page) {
+    switch (page) {
+      case DialogPage.personal_set_records:
+        return 'Personal Set Records';
+      case DialogPage.tournament_set_assistant:
+        return 'Tournament Set Assistant';
+      case DialogPage.tournament_screen:
+        return 'Tournament Set';
+      default:
+        return '';
+    }
   }
 }
 
-String getContent(DialogPage page) {
+String _getContent(DialogPage page) {
   switch (page) {
     case DialogPage.personal_set_records:
       return '- This page shows all the personal set records created by you.\n' +
