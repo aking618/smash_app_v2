@@ -47,6 +47,7 @@ class _RandomCharacterGeneratorState
           "filePath": result["filePaths"][i],
         }));
       }
+      // TODO: sort list alphabetically
       await SmashAppDatabase().insertRCGCharacterList(db, characters);
       setState(() {
         this.characters = characters;

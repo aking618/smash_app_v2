@@ -56,6 +56,8 @@ class _AddPersonalRecordState extends ConsumerState<AddPersonalRecord> {
           "filePath": result["filePaths"][i],
         }));
       }
+      // TODO: sort rchCharacterList alphabeticcaly
+
       await SmashAppDatabase().insertRCGCharacterList(db, characters);
       setState(() {
         _characters = characters;

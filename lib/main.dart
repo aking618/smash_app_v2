@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smash_app/constants/theme.dart';
 import 'package:smash_app/pages/home.dart';
 import 'package:smash_app/pages/login.dart';
@@ -14,18 +15,18 @@ void main() async {
   if (debugMode) Paint.enableDithering = true;
 
   final database = await SmashAppDatabase().intializedDB();
+  final sharedPrefs = await SharedPreferences.getInstance();
 
   ValueNotifier<GraphQLClient> client = initializeClient();
 
   runApp(
-    GraphQLProvider(
-      client: client,
-      child: ProviderScope(
-        child: MyApp(),
-        overrides: [
-          dbProvider.overrideWithValue(database),
-        ],
-      ),
+    ProviderScope(
+      child: MyApp(),
+      overrides: [
+        dbProvider.overrideWithValue(database),
+        clientProvider.overrideWithValue(client),
+        sharedPrefsProvider.overrideWithValue(sharedPrefs),
+      ],
     ),
   );
 }
