@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smash_app/constants/theme.dart';
+import 'package:smash_app/models/user.dart';
 import 'package:smash_app/pages/home.dart';
 import 'package:smash_app/pages/login.dart';
 import 'package:smash_app/services/db.dart';
@@ -17,14 +20,11 @@ void main() async {
   final database = await SmashAppDatabase().intializedDB();
   final sharedPrefs = await SharedPreferences.getInstance();
 
-  ValueNotifier<GraphQLClient> client = initializeClient();
-
   runApp(
     ProviderScope(
       child: MyApp(),
       overrides: [
         dbProvider.overrideWithValue(database),
-        clientProvider.overrideWithValue(client),
         sharedPrefsProvider.overrideWithValue(sharedPrefs),
       ],
     ),
@@ -40,22 +40,4 @@ class MyApp extends StatelessWidget {
       home: Login(),
     );
   }
-}
-
-ValueNotifier<GraphQLClient> initializeClient() {
-  final HttpLink httpLink = HttpLink('https://api.smash.gg/gql/alpha');
-
-  final AuthLink authLink = AuthLink(
-    getToken: () => 'Bearer 97f95303965bc5182e03797f7943332c',
-  );
-
-  final Link link = authLink.concat(httpLink);
-
-  final ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
-    GraphQLClient(
-      cache: GraphQLCache(),
-      link: link,
-    ),
-  );
-  return client;
 }

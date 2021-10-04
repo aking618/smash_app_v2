@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/pages/personal_set_records.dart';
+import 'package:smash_app/pages/profile_page.dart';
 import 'package:smash_app/pages/random_character_generator.dart';
 import 'package:smash_app/pages/tournament_set_assistant.dart';
 
@@ -21,6 +22,7 @@ class _HomeState extends State<Home> {
       'Random Character Generator': RandomCharacterGenerator(),
       'Tournament Set Assistant': TournamentAssistant(),
       'Personal Set Records': PersonalSetRecords(),
+      'Profile': ProfilePage(),
     };
   }
 

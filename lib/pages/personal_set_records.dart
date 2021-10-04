@@ -4,10 +4,12 @@ import 'package:smash_app/constants/background.dart';
 import 'package:smash_app/constants/player_card.dart';
 import 'package:smash_app/dialogs/dialog_page_enum.dart';
 import 'package:smash_app/dialogs/help_dialog.dart';
+import 'package:smash_app/models/user.dart';
 import 'package:smash_app/services/providers.dart';
 import 'package:smash_app/models/player_record.dart';
 import 'package:smash_app/pages/add_person_record.dart';
 import 'package:smash_app/services/db.dart';
+import 'package:smash_app/toasts/custom_toast.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PersonalSetRecords extends ConsumerStatefulWidget {
@@ -29,6 +31,7 @@ class _PersonalSetRecordsState extends ConsumerState<PersonalSetRecords> {
     super.initState();
     _searchText = '';
     db = ref.read(dbProvider);
+
     getRecords();
   }
 
@@ -182,6 +185,9 @@ class _PersonalSetRecordsState extends ConsumerState<PersonalSetRecords> {
 
   @override
   Widget build(BuildContext context) {
+    User? user = ref.watch(userProvider).state;
+    CustomToast().show(user.toString(), ToastType.info);
+
     return Background(
       child: Scaffold(
         body: buildBody(),
